@@ -1,5 +1,11 @@
 .App {
   text-align: center;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-gap: 10px;
+  grid-template-areas: "nav"
+  "content";
+  height: 100vh;
 }
 
 .App-logo {
@@ -35,4 +41,8 @@
   to {
     transform: rotate(360deg);
   }
+}
+a{
+  // Disable anchor link style
+  text-decoration: none;
 }

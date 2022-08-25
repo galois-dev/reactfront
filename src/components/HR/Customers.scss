@@ -1,0 +1,117 @@
+.CustomerView__container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 248px 1fr auto;
+  margin-top: 3em;
+  align-items: center;
+  grid-template-areas:
+    "profile info"
+    "subscription users"
+    "locations locations";
+  @media screen and (max-width: 768px) {  
+    margin: 0em;
+    max-width: 768px;
+    // width: 100vw;
+    grid-template-columns: auto;
+    grid-template-rows: 248px repeat(1fr, 4);
+    grid-template-areas: "profile" "info" "subscription" "users" "locations";
+  }
+}
+
+.CustomerView__info{
+  height: 100%;
+  grid-area: info;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  @media screen and (max-width: 768px) {  
+    grid-template-columns: 1fr 1fr;
+  }
+  align-content: space-between;
+  align-items: end;
+  grid-template-rows: auto auto auto;
+  .CustomerView__info__item:first-child{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start:1;
+    grid-row-end: 3;
+  }
+}
+
+.CustomerView__info__item{
+  font-size: 18px;
+  padding: 1em;
+}
+
+.CustomerView__lists {
+  padding: 1em;
+  align-self: end;
+  grid-area: users;
+}
+
+.CustomerView__subscription{
+  padding: 1em;
+  grid-area: subscription;
+  align-self: end;
+}
+
+.CustomerView__profile {
+  img {
+    border-radius: 50%;
+  }
+  font-size: 24px;
+  font-weight: bold;
+  grid-area: profile;
+}
+
+.CustomerView__locations{
+  padding: 1em;
+  grid-area: locations;
+}
+
+.Location__details{
+  // width: 100%;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: repeat(4,5em);
+  grid-template-areas: 
+  "address city zipcode state"
+  "email phone website status"
+  "note units id subscription"
+  "created modified ucreated umodified";
+  @media screen and (max-width: 768px) {
+    max-width: 768px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(8,3em);
+    grid-template-areas: 
+    "address city"
+    "zipcode state"
+    "email phone"
+    "website status"
+    "note units"
+    "id subscription"
+    "created modified"
+    "ucreated umodified";
+  }
+  & > div{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+
+.Location__detail__label{
+  color: darkgrey;
+  font-size: 12px;
+}
+
+.Location__detail__value{
+  font-size: 14px;
+}
+
+.Location_view__container{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas: "";
+}

@@ -1,0 +1,47 @@
+.UnitSideBar{
+  grid-area: UnitSideBar;
+  min-width: 16em;
+
+  .UnitSideBar__header{
+    background-color: #f5f5f5;
+    padding: .3em;
+    font-size: 24px;
+    font-weight: bold;
+  }
+}
+
+.UnitsTopBar{
+  grid-area: UnitTopBar;
+  background-color: #f5f5f5;
+  font-size: 24px;
+  padding: .3em;
+  font-weight: bold;
+}
+
+.unitsform__content{
+  margin: 1.5em;
+  & > form {
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 1.5em;
+  }
+  & :last-child {
+    align-items: self-end;
+  }
+}
+
+
+
+.UnitsDetailView{
+  grid-area: UnitDetailView;
+}
+
+.Units{
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 2fr;
+  grid-template-rows: 48px 1fr;
+  grid-template-areas:
+    "UnitSideBar UnitTopBar"
+    "UnitSideBar UnitDetailView";
+}
