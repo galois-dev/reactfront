@@ -1,7 +1,6 @@
 .UnitSideBar{
   grid-area: UnitSideBar;
   min-width: 16em;
-
   .UnitSideBar__header{
     background-color: #f5f5f5;
     padding: .3em;
@@ -9,6 +8,7 @@
     font-weight: bold;
   }
 }
+
 
 .UnitsTopBar{
   grid-area: UnitTopBar;
@@ -30,13 +30,12 @@
   }
 }
 
-
-
 .UnitsDetailView{
   grid-area: UnitDetailView;
+  margin: 1em;
 }
 
-.Units{
+.Units{ 
   margin: 0;
   display: grid;
   grid-template-columns: auto 2fr;

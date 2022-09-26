@@ -16,6 +16,18 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import BuildIcon from "@mui/icons-material/Build";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import "./Units.scss";
+import Container from "@mui/material/Container";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Rating from "@mui/material/Rating";
+import { FieldBodyRow, InputHeaderRow } from "./UnitFields";
+import { Input } from "@mui/material";
 
 const initialState = {
   customerList: [],
@@ -62,14 +74,37 @@ function reducer(state, action) {
         subPage: "UnitsView",
       };
     case "SELECT_UNIT":
+      if (Object.keys(action.payload).length !== 0) {
+        let unit_field_collector = {};
+        let grouped_field_tuples = [];
+
+        for (let i = 0; i < action.payload.fields.length; i++) {
+          const element = action.payload.fields[i];
+          if (unit_field_collector[element.name] === undefined) {
+            unit_field_collector[element.name] = [];
+          }
+          unit_field_collector[element.name].push(element);
+        }
+
+        Object.values(unit_field_collector).forEach((field_list) => {
+          field_list = field_list.sort((a, b) => {
+            return new Date(a.date_created) - new Date(b.date_created);
+          });
+          // field_list = field_list.reverse();
+          grouped_field_tuples.push([field_list[0].name, field_list]);
+        });
+        action.payload.grouped_field_tuples = grouped_field_tuples;
+      }
       return {
         ...state,
         selectedUnit: action.payload,
       };
     case "SET_CUSTOMERLIST":
       return { ...state, customerList: action.payload };
-    case "SET_SUBPAGE":
-      return { ...state, subPage: action.payload };
+    case "PUSH_FIELD":
+      let selectedUnit = state.selectedUnit;
+
+      return { ...state, selectedUnit: action.payload.field };
     case "SET_IDENTITYLIST":
       return { ...state, IdentityList: action.payload };
     default:
@@ -101,8 +136,12 @@ const UnitInfoView = ({ unit }) => {
           <ListItem>
             Status: {unit.status === "A" ? "Active" : "Inactive"}
           </ListItem>
-          <ListItem>Created on: {unit.date_created}</ListItem>
-          <ListItem>Updated on: {unit.date_modified}</ListItem>
+          <ListItem>
+            Created on: {new Date(unit.date_created).toLocaleDateString()}
+          </ListItem>
+          <ListItem>
+            Updated on: {new Date(unit.date_modified).toLocaleDateString()}
+          </ListItem>
           <ListItem>Created by: {unit.user_created}</ListItem>
           <ListItem>Updated By: {unit.user_modified}</ListItem>
         </List>
@@ -179,7 +218,7 @@ const IdentityView = ({ unit }) => {
 };
 
 const UnitFieldView = ({ unit }) => {
-  let childRows = [];
+  // let childRows = [];
   const [open, setOpen] = React.useState({});
 
   const handleClick = (index) => {
@@ -201,26 +240,6 @@ const UnitFieldView = ({ unit }) => {
     return <div>Identity not found</div>;
   }
 
-  unit?.fields.forEach((field) => {
-    childRows.push({
-      field: field.name,
-      value: field.value,
-      type: field.type,
-      meta: field.meta,
-    });
-  });
-
-  // const RowItem = ({ field, value, type, meta }) => {
-  //   return (
-  //     <TableRow>
-  //       <TableCell>{field}</TableCell>
-  //       <TableCell>{type}</TableCell>
-  //       <TableCell>{typeof value === "Object" ? value : ""}</TableCell>
-  //       <TableCell>{typeof meta === "Object" ? meta : ""}</TableCell>
-  //     </TableRow>
-  //   );
-  // };
-
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -230,7 +249,7 @@ const UnitFieldView = ({ unit }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {childRows.map((row, index) => {
+          {unit.grouped_field_tuples.map((row, index) => {
             return (
               <List key={String(index)}>
                 <ListItemButton
@@ -241,14 +260,40 @@ const UnitFieldView = ({ unit }) => {
                   <ListItemIcon>
                     <BuildIcon />
                   </ListItemIcon>
-                  <ListItemText primary={row.type + "\t\\\\\t" + row.field} />
+                  <ListItemText
+                    primary={row[1][0].type + "\t\\\\\t" + row[0]}
+                  />
                   {open[String(index)] ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse
-                  in={open[String(index)]}
-                  timeout="auto"
-                  unmountOnExit
-                ></Collapse>
+                <Collapse in={open[String(index)]} timeout="auto" unmountOnExit>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Value</TableCell>
+                          <TableCell>Meta</TableCell>
+                          <TableCell>Date</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <InputHeaderRow row={row} key={index} />
+                        {row[1]
+                          .sort((a, b) => {
+                            return (
+                              new Date(a.date_created) -
+                              new Date(b.date_created)
+                            );
+                          })
+                          .reverse()
+                          .map((field, Lindex) => {
+                            return <FieldBodyRow field={field} key={Lindex} />;
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Collapse>
               </List>
             );
           })}
@@ -259,11 +304,37 @@ const UnitFieldView = ({ unit }) => {
 };
 
 const Unit = ({ unit }) => {
+  React.useEffect(() => {
+    if (Object.keys(unit).length !== 0) {
+      let unit_field_collector = {};
+      let grouped_field_tuples = [];
+
+      for (let i = 0; i < unit.fields.length; i++) {
+        const element = unit.fields[i];
+        if (unit_field_collector[element.name] === undefined) {
+          unit_field_collector[element.name] = [];
+        }
+        unit_field_collector[element.name].push(element);
+      }
+
+      Object.values(unit_field_collector).forEach((field_list) => {
+        field_list = field_list.sort((a, b) => {
+          return new Date(a.date_created) - new Date(b.date_created);
+        });
+        field_list = field_list.reverse();
+        grouped_field_tuples.push([field_list[0].name, field_list]);
+      });
+      unit.grouped_field_tuples = grouped_field_tuples;
+    }
+  }, [unit]);
+
   return (
-    <div className="UnitsDetailView">
-      <UnitInfoView unit={unit} />
-      <UnitFieldView unit={unit} />
-    </div>
+    <Container fixed>
+      <div className="UnitsDetailView">
+        <UnitInfoView unit={unit} />
+        <UnitFieldView unit={unit} />
+      </div>
+    </Container>
   );
 };
 
@@ -272,7 +343,9 @@ const UnitsDetailView = () => {
 
   return (
     <StateContext.Provider value={{ state, dispatch }}>
-      <Unit unit={state.selectedUnit} />
+      <Container fixed>
+        <Unit unit={state.selectedUnit} />
+      </Container>
     </StateContext.Provider>
   );
 };

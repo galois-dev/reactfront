@@ -8,6 +8,8 @@ import Customers from "./components/HR/Customers.js";
 import Customer from "./components/HR/Customer.js";
 import User from "./components/HR/User.js";
 import Units from "./components/Units/Units.js";
+import UnitsDetailView from "./components/Units/Unit_pk.js";
+import Identity from "./components/Units/Identity";
 import * as React from "react";
 import axios from "axios";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
@@ -123,12 +125,35 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/units"
               element={
                 <ProtectedRoute user={user}>
                   <Units />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/units/customer/:id"
+              element={
+                <ProtectedRoute user={user}>
+                  <UnitsDetailView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/units/identity"
+              element={
+                <ProtectedRoute user={user}>
+                  <Identity />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/units/identity/:id"
+              element={
+                <ProtectedRoute user={user}>
+                  <Identity />
                 </ProtectedRoute>
               }
             />

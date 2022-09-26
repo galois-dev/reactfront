@@ -1,0 +1,44 @@
+.IdentityForm{
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "list header"
+                      "list form";
+
+}
+
+.IdentityFormInput{
+  margin: 1em;
+  grid-area: form;
+  display: flex;
+  flex-direction: column;
+  
+  & > * {
+    margin: 0;
+    gap: 1em;
+    display: flex;
+    flex-direction: column;
+  }
+  & > :first-child{
+    margin-bottom: 2em;
+  }
+  & > :last-child{
+    margin-top: 2em;
+  }
+}
+
+.IdentityTypeList{
+  grid-area: list;
+
+}
+
+.UnitFormInput__SingleFile{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: start;
+  span {
+    margin: 0;
+    padding-bottom: 4px;
+  }
+}
