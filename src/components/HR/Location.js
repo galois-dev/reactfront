@@ -1,5 +1,4 @@
 import * as React from "react";
-import "./Customers.scss";
 import status_switch from "../../helpers/status";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";

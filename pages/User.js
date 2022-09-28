@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
-import { Axios } from "../../App";
+import { Axios } from "./index";
 
 const User = ({}) => {
   let { id } = useParams();

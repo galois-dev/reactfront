@@ -35,6 +35,10 @@
     grid-row-start:1;
     grid-row-end: 3;
   }
+  & > :nth-child(1){
+    justify-self: end;
+    align-self: end;
+  }
 }
 
 .CustomerView__info__item{

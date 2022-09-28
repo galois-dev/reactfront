@@ -1,5 +1,10 @@
 import * as React from "react";
-import { useGlobalContext } from "../../helpers/auth";
+import {
+  useGlobalContext,
+  AppContext,
+  useAppContext,
+} from "../src/helpers/auth";
+import Container from "@mui/material/Container";
 
 export default function Home() {
   const {
@@ -19,8 +24,10 @@ export default function Home() {
   } = useGlobalContext();
 
   return (
-    <div className="Home">
-      <p>{refreshToken}</p>
-    </div>
+    <Container fixed>
+      <div className="Home">
+        <p>{refreshToken}</p>
+      </div>
+    </Container>
   );
 }

@@ -1,11 +1,8 @@
 import React, { useContext, createContext, useState } from "react";
-import {
-  Routes,
-  Route,
-  NavLink,
-  useNavigate,
-  Navigate,
-} from "react-router-dom";
+// import { useNavigate, Navigate } from "react-router-dom";
+import { useRouter } from "next/router";
+
+import { useLocalStorage } from "./hooks";
 const AppContext = createContext();
 
 export const ProtectedRoute = ({ user, children }) => {
@@ -18,33 +15,35 @@ export const ProtectedRoute = ({ user, children }) => {
 export const retriveUserFromLocalStorage = () => {
   let user = {};
   user.isAuthenticated = false;
-  user.access = localStorage.getItem("access_token")
-    ? localStorage.getItem("access_token")
-    : "";
-  user.refresh = localStorage.getItem("refresh_token")
-    ? localStorage.getItem("refresh_token")
-    : "";
-  if (user.access !== "" && user.refresh !== "") {
-    user.isAuthenticated = true;
+  if (typeof window !== "undefined") {
+    user.access = localStorage.getItem("access_token")
+      ? localStorage.getItem("access_token")
+      : "";
+    user.refresh = localStorage.getItem("refresh_token")
+      ? localStorage.getItem("refresh_token")
+      : "";
+    if (user.access !== "" && user.refresh !== "") {
+      user.isAuthenticated = true;
+    }
   }
   return user;
 };
 
 const AppProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({});
-  const [token, setToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useLocalStorage(false);
+  const [user, setUser] = useLocalStorage({});
+  const [token, setToken] = useLocalStorage("");
+  const [refreshToken, setRefreshToken] = useLocalStorage("");
+  const [isLoading, setIsLoading] = useLocalStorage(false);
+  const [error, setError] = useLocalStorage("");
+  const navigate = useRouter();
 
   const setAuth = (data) => {
     setIsAuthenticated(true);
     setUser(data.user);
     setToken(data.access);
     setRefreshToken(data.refresh);
-    navigate("/");
+    navigate.push("/");
   };
 
   const setLogout = () => {

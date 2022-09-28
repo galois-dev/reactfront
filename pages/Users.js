@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Axios } from "../../App";
+import { Axios } from "./index";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
 

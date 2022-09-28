@@ -1,6 +1,6 @@
 import * as React from "react";
-import Unit from "./Unit";
-import { Axios } from "../../App";
+import { Unit, IdentityJsonbView } from "./Unit";
+import { Axios } from "../../../pages/index";
 import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
@@ -36,7 +36,7 @@ const initialState = {
   selectedUnit: {},
   selectedField: {},
   IdentityList: [],
-  subPage: "UnitsView",
+  subPage: "UnitForm",
 };
 
 function reducer(state, action) {
@@ -391,58 +391,6 @@ const UnitForm = () => {
   );
 };
 
-export const IdentityJsonbView = ({ identity }) => {
-  let childRows = [];
-
-  Object.keys(JSON.parse(identity.field_jsonb)).forEach((field) => {
-    childRows.push({
-      field: field,
-      value: JSON.parse(identity.field_jsonb)[field].value,
-      type: JSON.parse(identity.field_jsonb)[field].type,
-      meta: JSON.parse(identity.field_jsonb)[field].meta,
-    });
-  });
-
-  const RowItem = ({ field, value, type, meta }) => {
-    return (
-      <TableRow>
-        <TableCell>{field}</TableCell>
-        <TableCell>{type}</TableCell>
-        <TableCell>{typeof value === "Object" ? value : ""}</TableCell>
-        <TableCell>{typeof meta === "Object" ? meta : ""}</TableCell>
-      </TableRow>
-    );
-  };
-
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Field Name</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Default Value</TableCell>
-            <TableCell>Meta Options</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {childRows.map((row, index) => {
-            return (
-              <RowItem
-                key={index}
-                field={row.field}
-                value={row.value}
-                type={row.type}
-                meta={row.meta}
-              />
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
-
 const UnitsTopBar = () => {
   return <div className="UnitsTopBar">Unit Details</div>;
 };
@@ -455,8 +403,15 @@ const Units = () => {
   React.useEffect(() => {
     Axios.get("/api/customers/" + id)
       .then((response) => {
-        console.log(response);
         dispatch({ type: "SELECT_CUSTOMER", payload: response.data });
+        if (response.data.locations.length > 0) {
+          if (response.data.locations[0].onprem_units.length > 0) {
+            dispatch({
+              type: "SELECT_UNIT",
+              payload: response.data.locations[0].onprem_units[0],
+            });
+          }
+        }
       })
       .catch((error) => {
         console.log(error);

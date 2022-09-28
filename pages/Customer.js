@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { Axios } from "../../App";
+import { Axios } from "./index";
 import { useNavigate } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -15,7 +15,6 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import "./Customers.scss";
 import { ErrorBoundary } from "react-error-boundary";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -30,8 +29,8 @@ import SvgIcon from "@mui/material/SvgIcon";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import LocationView from "./Location.js";
-import status_switch from "../../helpers/status";
+import LocationView from "../src/components/HR/Location.js";
+import status_switch from "../src/helpers/status";
 
 const initialState = {
   customerList: [],

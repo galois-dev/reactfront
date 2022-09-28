@@ -1,22 +1,30 @@
 import * as React from "react";
 import { useGlobalContext } from "../../helpers/auth";
-import { Link } from "react-router-dom";
-import Paper from "@mui/material/Paper";
-import MenuList from "@mui/material/MenuList";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
+import MenuList from "@mui/material/MenuList";
+import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
+import Drawer from "@mui/material/Drawer";
+import { settings, pages } from "../../../pages/index";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 
 const iconSwitch = (icon) => {
   switch (icon) {
@@ -30,50 +38,39 @@ const iconSwitch = (icon) => {
 const NavLink = ({ to, icon, children }) => {
   return (
     <MenuItem>
-      <Link to={to}>
+      <Link href={to}>
         <p>{children}</p>
       </Link>
     </MenuItem>
   );
 };
 
-const pages = [
-  {
-    to: "/",
-    name: "Home",
+const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+  alignItems: "flex-start",
+  paddingTop: theme.spacing(1),
+  paddingBottom: theme.spacing(2),
+  // Override media queries injected by theme.mixins.toolbar
+  "@media all": {
+    minHeight: 128,
   },
-  {
-    to: "/Units",
-    name: "Units",
-  },
-  {
-    to: "/Customers",
-    name: "Customers",
-  },
-  {
-    to: "/Tasks",
-    name: "Tasks",
-  },
-  {
-    to: "/Dashboard",
-    name: "Dashboard",
-  },
-  {
-    to: "/Users",
-    name: "Users",
-  },
-];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+}));
 
 const Navbar = () => {
   const { refreshToken } = useGlobalContext();
+  const nav = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [open, setOpen] = React.useState(true);
+  const [openAPI, setOpenAPI] = React.useState(false);
+  const [openPDF, setOpenPDF] = React.useState(false);
   // #TODO: add condition to hide on login, signup and pwd reset pages.
+
+  const redirectPage = (to) => nav.push(to);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -86,91 +83,130 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  if (window.location.pathname === "/login") {
+  if (
+    typeof window !== "undefined" &&
+    ["login", "signup", "reset"].includes(
+      window.location.pathname.split("/")[1].toLowerCase()
+    )
+  ) {
     return <></>;
   }
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
+    <AppBar position="fixed" open={open}>
+      <Drawer
+        open={open}
+        sx={{
+          width: 200,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: 200,
+            boxSizing: "border-box",
+          },
+        }}
+        variant="permanent"
+        anchor="left"
+      >
+        <Toolbar
+          sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
           <Typography
             variant="h6"
-            noWrap
             component="div"
-            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+            sx={{ mt: 4, display: { xs: "none", md: "flex" } }}
           >
             LOGO
           </Typography>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: "block", md: "none" },
-              }}
-            >
+          <Box sx={{ flexGrow: 2, width: 320, maxWidth: "100%" }}>
+            <MenuList>
               {pages.map((page) => (
-                <Link key={page.name} to={page.to}>
-                  <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page.name}</Typography>
-                  </MenuItem>
-                </Link>
-              ))}
-            </Menu>
-          </Box>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
-          >
-            LOGO
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Link key={page.name} to={page.to}>
-                <Button
+                <MenuItem
                   key={page.name}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
+                  onClick={() => {
+                    redirectPage(page.to);
+                  }}
                 >
-                  {page.name}
-                </Button>
-              </Link>
-            ))}
+                  <ListItemText align="left" primary={page.name} />
+                </MenuItem>
+              ))}
+            </MenuList>
+
+            <ListItemButton
+              onClick={() => {
+                setOpenAPI(!openAPI);
+              }}
+            >
+              <ListItemText primary="Integrations" />
+              {openAPI ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openAPI} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <MenuItem
+                  sx={{ pl: 4 }}
+                  align="left"
+                  onClick={() => {
+                    redirectPage("/acctec");
+                  }}
+                >
+                  <ListItemText primary="AccTec" />
+                </MenuItem>
+                <MenuItem
+                  sx={{ pl: 4 }}
+                  align="left"
+                  onClick={() => {
+                    redirectPage("/SIM");
+                  }}
+                >
+                  <ListItemText primary="SIM" />
+                </MenuItem>
+              </List>
+            </Collapse>
+
+            <ListItemButton
+              onClick={() => {
+                setOpenPDF(!openPDF);
+              }}
+            >
+              <ListItemText primary="PDF" />
+              {openPDF ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openPDF} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <MenuItem
+                  sx={{ pl: 4 }}
+                  align="left"
+                  onClick={() => {
+                    redirectPage("/pdf");
+                  }}
+                >
+                  <ListItemText primary="Overview" />
+                </MenuItem>
+                <MenuItem
+                  sx={{ pl: 4 }}
+                  align="left"
+                  onClick={() => {
+                    redirectPage("/pdf/forholdsordre");
+                  }}
+                >
+                  <ListItemText primary="Forholdsordre" />
+                </MenuItem>
+              </List>
+            </Collapse>
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
+          <Tooltip title="Open settings">
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+            </IconButton>
+          </Tooltip>
+
+          <Box sx={{ mb: 2 }}>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -193,7 +229,7 @@ const Navbar = () => {
             </Menu>
           </Box>
         </Toolbar>
-      </Container>
+      </Drawer>
     </AppBar>
   );
 };

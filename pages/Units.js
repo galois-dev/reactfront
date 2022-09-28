@@ -1,6 +1,5 @@
 import * as React from "react";
-import "./Units.scss";
-import { Axios } from "../../App";
+import { Axios } from "./index";
 import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
@@ -25,10 +24,10 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Input from "@mui/material/Input";
-import Unit from "./Unit";
-import status_switch from "../../helpers/status";
+import Unit from "../src/components/Units/Unit";
+import status_switch from "../src/helpers/status";
 import { useNavigate } from "react-router-dom";
-
+import usePersistedReducer from "../src/helpers/hooks";
 const initialState = {
   customerList: [],
   selectedCustomer: {},
@@ -148,7 +147,7 @@ const IdentityListView = () => {
           <TableHead>
             <TableRow>
               <TableCell>Identity</TableCell>
-              <TableCell align="right" widtH={50}>
+              <TableCell align="right" width={50}>
                 <Button
                   variant="outlined"
                   onClick={() => {
@@ -171,6 +170,7 @@ const IdentityListView = () => {
                 <TableCell component="th" scope="row">
                   {identity.name}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -182,6 +182,7 @@ const IdentityListView = () => {
 
 export const CustomerList = () => {
   const { state, dispatch } = React.useContext(StateContext);
+
   const navigate = useNavigate();
 
   function HandleClick(id) {
@@ -190,7 +191,31 @@ export const CustomerList = () => {
   }
 
   if (state.customerList.length === 0) {
-    return <></>;
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          maxHeight: 400,
+          bgcolor: "background.paper",
+        }}
+      >
+        <div className="IdentityListHeader">
+          <h2>Customers</h2>
+        </div>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Subscription</TableCell>
+                <TableCell align="left">Description</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+          </Table>
+        </TableContainer>
+      </Box>
+    );
   }
 
   return (
@@ -233,32 +258,6 @@ export const CustomerList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* <List height={400}>
-        {state.customerList.map((customer, index) => {
-          return (
-            <Link
-              key={customer.id}
-              to={`/units?customer=${customer.id}`}
-              onClick={() => {
-                dispatch({ type: "SELECT_CUSTOMER", payload: customer });
-              }}
-            >
-              <ListItemButton
-                className="CustomerList__item"
-                selected={state.selectCustomer?.id === customer.id}
-              >
-                <ListItemText
-                  style={{
-                    textAlign: "center",
-                  }}
-                  primary={customer.name}
-                />
-              </ListItemButton>
-            </Link>
-          );
-        })}
-      </List> */}
     </Box>
   );
 };

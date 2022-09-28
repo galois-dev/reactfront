@@ -16,7 +16,6 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import BuildIcon from "@mui/icons-material/Build";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import "./Units.scss";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -85,7 +84,7 @@ function reducer(state, action) {
           }
           unit_field_collector[element.name].push(element);
         }
-
+        console.log(unit_field_collector);
         Object.values(unit_field_collector).forEach((field_list) => {
           field_list = field_list.sort((a, b) => {
             return new Date(a.date_created) - new Date(b.date_created);
@@ -102,8 +101,6 @@ function reducer(state, action) {
     case "SET_CUSTOMERLIST":
       return { ...state, customerList: action.payload };
     case "PUSH_FIELD":
-      let selectedUnit = state.selectedUnit;
-
       return { ...state, selectedUnit: action.payload.field };
     case "SET_IDENTITYLIST":
       return { ...state, IdentityList: action.payload };
@@ -153,16 +150,20 @@ const UnitInfoView = ({ unit }) => {
 export const IdentityJsonbView = ({ identity }) => {
   let childRows = [];
 
-  if (identity === undefined) {
+  if (identity === undefined || Object.keys(identity).length === 0) {
     return <div>Identity not found</div>;
   }
 
-  Object.keys(JSON.parse(identity.field_jsonb)).forEach((field) => {
+  if (typeof identity.field_jsonb === "string") {
+    identity.field_jsonb = JSON.parse(identity.field_jsonb);
+  }
+
+  Object.keys(identity.field_jsonb).forEach((field) => {
     childRows.push({
       field: field,
-      value: JSON.parse(identity.field_jsonb)[field].value,
-      type: JSON.parse(identity.field_jsonb)[field].type,
-      meta: JSON.parse(identity.field_jsonb)[field].meta,
+      value: identity.field_jsonb[field].value,
+      type: identity.field_jsonb[field].type,
+      meta: identity.field_jsonb[field].meta,
     });
   });
 
@@ -220,7 +221,6 @@ const IdentityView = ({ unit }) => {
 const UnitFieldView = ({ unit }) => {
   // let childRows = [];
   const [open, setOpen] = React.useState({});
-
   const handleClick = (index) => {
     // Cant mutate open state so we mutate a copy and overwrite
     let openRes = { ...open };
@@ -236,7 +236,7 @@ const UnitFieldView = ({ unit }) => {
     setOpen(openRes);
   };
 
-  if (unit.identity === undefined) {
+  if (unit.identity === undefined || Object.keys(unit.identity).length === 0) {
     return <div>Identity not found</div>;
   }
 
@@ -266,7 +266,12 @@ const UnitFieldView = ({ unit }) => {
                   {open[String(index)] ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={open[String(index)]} timeout="auto" unmountOnExit>
-                  <TableContainer>
+                  <InputHeaderRow
+                    row={row}
+                    key={index}
+                    identity={unit.identity}
+                  />
+                  <TableContainer component={Paper}>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -278,7 +283,6 @@ const UnitFieldView = ({ unit }) => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        <InputHeaderRow row={row} key={index} />
                         {row[1]
                           .sort((a, b) => {
                             return (
@@ -303,28 +307,30 @@ const UnitFieldView = ({ unit }) => {
   );
 };
 
-const Unit = ({ unit }) => {
+export const Unit = ({ unit }) => {
   React.useEffect(() => {
-    if (Object.keys(unit).length !== 0) {
-      let unit_field_collector = {};
-      let grouped_field_tuples = [];
+    if (unit !== undefined && Object.keys(unit).length !== 0) {
+      if (unit.fields !== undefined && Object.keys(unit.fields).length !== 0) {
+        let unit_field_collector = {};
+        let grouped_field_tuples = [];
 
-      for (let i = 0; i < unit.fields.length; i++) {
-        const element = unit.fields[i];
-        if (unit_field_collector[element.name] === undefined) {
-          unit_field_collector[element.name] = [];
+        for (let i = 0; i < unit.fields.length; i++) {
+          const element = unit.fields[i];
+          if (unit_field_collector[element.name] === undefined) {
+            unit_field_collector[element.name] = [];
+          }
+          unit_field_collector[element.name].push(element);
         }
-        unit_field_collector[element.name].push(element);
-      }
 
-      Object.values(unit_field_collector).forEach((field_list) => {
-        field_list = field_list.sort((a, b) => {
-          return new Date(a.date_created) - new Date(b.date_created);
+        Object.values(unit_field_collector).forEach((field_list) => {
+          field_list = field_list.sort((a, b) => {
+            return new Date(a.date_created) - new Date(b.date_created);
+          });
+          field_list = field_list.reverse();
+          grouped_field_tuples.push([field_list[0].name, field_list]);
         });
-        field_list = field_list.reverse();
-        grouped_field_tuples.push([field_list[0].name, field_list]);
-      });
-      unit.grouped_field_tuples = grouped_field_tuples;
+        unit.grouped_field_tuples = grouped_field_tuples;
+      }
     }
   }, [unit]);
 
@@ -340,7 +346,10 @@ const Unit = ({ unit }) => {
 
 const UnitsDetailView = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-
+  if (state.selectedUnit === undefined) {
+    return <></>;
+  }
+  console.log(state.selectedUnit);
   return (
     <StateContext.Provider value={{ state, dispatch }}>
       <Container fixed>
@@ -350,4 +359,4 @@ const UnitsDetailView = () => {
   );
 };
 
-export default Unit;
+export default { Unit, IdentityJsonbView };

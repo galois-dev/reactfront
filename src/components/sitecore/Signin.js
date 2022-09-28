@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,15 +11,13 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Axios } from "../../App";
-import { Navigate } from "react-router-dom";
+import { Axios } from "../../../pages/index";
 // import context
 import { useGlobalContext } from "../../helpers/auth";
 const theme = createTheme();
 
 export default function SignIn() {
-  const { setAuth, setRefreshToken, setLoading, setErrorMessage } =
-    useGlobalContext();
+  const { setAuth, setRefreshToken } = useGlobalContext();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);

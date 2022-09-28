@@ -44,3 +44,41 @@
     "UnitSideBar UnitTopBar"
     "UnitSideBar UnitDetailView";
 }
+
+.input__form_info{
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+}
+
+.input_form_info_cell{
+
+}
+
+.input__form{
+
+  & > * {
+    width: 100%;
+    margin: auto;
+    justify-content: center;
+  }
+  display: flex;
+  gap: 1em;
+  padding: 1em;
+  align-items: center;
+  flex-direction: column;
+  width: 50%;
+}
+
+.unit_table__input{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+  text-align: center;
+}
