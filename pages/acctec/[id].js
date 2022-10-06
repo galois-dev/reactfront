@@ -107,12 +107,13 @@ export const ScanPK = () => {
 
   function postToken() {
     let selectedGroups = selectedGroupIndexes.map((i) => groups[i].id);
-    Axios.post("/api/LimitedAccessToken", {
+    Axios.post("/api/rfid/", {
+      status: "A",
       Token: id,
       Group: selectedGroups,
     })
       .then((res) => {
-        router.push(`/acctec/${id}`);
+        router.reload(`/acctec/${id}`);
       })
       .catch((err) => {
         console.log(err);
