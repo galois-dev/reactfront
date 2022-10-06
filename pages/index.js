@@ -18,7 +18,7 @@ import {
 } from "../src/helpers/auth.js";
 import Navbar from "../src/components/sitecore/Navbar.js";
 
-const API_URL = "https://localhost:8000";
+const API_URL = "https://whale-app-tv6wx.ondigitalocean.app/";
 export const Axios = axios.create({
   baseURL: API_URL,
   timeout: 1000,

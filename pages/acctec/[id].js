@@ -132,7 +132,7 @@ export const ScanPK = () => {
     if (selectedGroupIndexes?.length > 0) {
       let newGroups = [];
       selectedGroupIndexes.forEach((i) => {
-        if (i !== -1) {
+        if (i !== -1) { // No idea why -1 appears as an index but it does.
           newGroups.push(groups[i].id);
         }
       });
