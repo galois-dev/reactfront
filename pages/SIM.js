@@ -7,7 +7,7 @@ export const SIM = () => {
   return (
     <Container component={Paper}>
       <h1>test</h1>
-      <Crudlist
+      {/* <Crudlist
         api_endpoint="/SIM"
         haslist={true}
         hasmodal={true}
@@ -19,7 +19,7 @@ export const SIM = () => {
           { id: "sim_status", label: "SIM Status", minWidth: 170 },
           { id: "phone_number", label: "Phone Number", minWidth: 170 },
         ]}
-      />
+      /> */}
     </Container>
   );
 };

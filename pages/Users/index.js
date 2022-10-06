@@ -70,7 +70,7 @@ const Users = ({}) => {
   };
 
   const handleRowClick = ({ columns, getValue, id, row }) => {
-    navigate.push(`../users/${row.id}`, { replace: false });
+    navigate.push(`/users/${row.id}`);
   };
 
   return (
@@ -92,7 +92,7 @@ const Users = ({}) => {
               style={{ marginBottom: "1.2em" }}
               id="public-user-search"
               label="Search for a user by email, username, or id"
-              fullWidth
+              fullWidth={true}
               variant="outlined"
             /> */}
             <DataGrid
@@ -111,7 +111,7 @@ const Users = ({}) => {
               style={{ marginBottom: "1.2em" }}
               id="public-staff-search"
               label="Search for an employee by email, username, or id"
-              fullWidth
+              fullWidth={true}
               variant="outlined"
             /> */}
             <DataGrid

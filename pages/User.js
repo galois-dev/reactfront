@@ -1,9 +1,10 @@
 import * as React from "react";
-import { useRouter, useParam } from "next/router";
+import { useRouter } from "next/router";
 import { Axios } from "./index";
 
 const User = ({}) => {
-  let { id } = useParam();
+  const router = useRouter();
+  const { id } = router.query;
   let [data, setData] = React.useState();
 
   React.useEffect(() => {

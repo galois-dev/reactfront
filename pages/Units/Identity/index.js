@@ -24,7 +24,6 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
-import NumberFormat from "react-number-format";
 import { DataGrid } from "@mui/x-data-grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -35,31 +34,6 @@ import TableRow from "@mui/material/TableRow";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import Rating from "@mui/material/Rating";
-
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
-  props,
-  ref
-) {
-  const { onChange, ...other } = props;
-
-  return (
-    <NumberFormat
-      {...other}
-      getInputRef={ref}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        });
-      }}
-      thousandSeparator
-      isNumericString
-      prefix="$"
-    />
-  );
-});
 
 const InitialFormData = {
   default_string: {
@@ -400,7 +374,6 @@ const IdentityForm = () => {
               <Tab label="Types"></Tab>
               <Tab label={"Fields: " + fieldArray.length}></Tab>
             </Tabs>
-
             <TabPanel value={tabRoute} index={0}>
               <List sx={{ padding: 0 }}>
                 <ListItemButton
@@ -506,17 +479,14 @@ const IdentityForm = () => {
           </Box>
         </div>
         <div className={fieldIndex === -1 && tabRoute !== 0 ? "hidden" : ""}>
-          <Container
-            component={Paper}
-            sx={{ maxWidth: "60ch", marginTop: 4, p: 1 }}
-          >
+          <Container component={Paper} sx={{ mt: 4, p: 1 }} fixed>
             <div className="IdentityFormInput">
               {/* --- ALL BEFORE --- */}
-              <FormControl fullWidth variant="standard">
+              <FormControl fullWidth={true} variant={"standard"}>
                 <TextField
                   id="standard-basic"
                   label="Field Name"
-                  variant="standard"
+                  variant={"standard"}
                   sx={{ width: "100%" }}
                   name="name"
                   onChange={handleChangeFieldParam}
@@ -558,12 +528,12 @@ const IdentityForm = () => {
                   identityFieldType === "string" ? "active" : "hidden"
                 }`}
               >
-                <FormControl FormControl fullWidth variant="standard">
+                <FormControl FormControl fullWidth={true} variant={"standard"}>
                   <span className="UnitFormInput__SingleFile">
                     <TextField
                       id="standard-basic"
                       label="Default value"
-                      variant="standard"
+                      variant={"standard"}
                       name="default"
                       onChange={handleChangeFieldParam}
                       value={
@@ -574,14 +544,14 @@ const IdentityForm = () => {
                   </span>
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
                     display: "grid",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -601,9 +571,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max_char
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -625,7 +592,7 @@ const IdentityForm = () => {
                     label="Default value"
                     name="default"
                     onChange={handleChangeFieldParam}
-                    variant="standard"
+                    variant={"standard"}
                     sx={{ width: "100%", paddingRight: 3 }}
                   />
                 </span>
@@ -648,7 +615,7 @@ const IdentityForm = () => {
                       }
                       onChange={handleChangeFieldParam}
                       sx={{ width: "100%", m: 0.5 }}
-                      variant="standard"
+                      variant={"standard"}
                     />
                     <Button
                       variant="outlined"
@@ -718,7 +685,7 @@ const IdentityForm = () => {
                       }
                       onChange={handleChangeFieldParam}
                       sx={{ width: "100%", m: 0.5 }}
-                      variant="standard"
+                      variant={"standard"}
                     />
                     <Button
                       variant="outlined"
@@ -778,7 +745,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -786,7 +753,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -802,9 +769,6 @@ const IdentityForm = () => {
                         onChange={handleChangeFieldParam}
                         value={formData["default_" + identityFieldType].default}
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -812,7 +776,7 @@ const IdentityForm = () => {
                   />
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -820,7 +784,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -838,9 +802,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.min
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -862,9 +823,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -880,7 +838,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -888,7 +846,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -904,9 +862,6 @@ const IdentityForm = () => {
                         onChange={handleChangeFieldParam}
                         value={formData["default_" + identityFieldType].default}
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -914,7 +869,7 @@ const IdentityForm = () => {
                   />
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -922,7 +877,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -940,9 +895,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.min
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -964,9 +916,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -1015,9 +964,6 @@ const IdentityForm = () => {
                       onChange={handleChangeFieldParam}
                       value={formData["default_" + identityFieldType].meta.max}
                       id="outlined-adornment-weight"
-                      inputProps={{
-                        inputComponent: NumberFormatCustom,
-                      }}
                       aria-describedby="outlined-weight-helper-text"
                     />
                   </div>
@@ -1107,14 +1053,14 @@ const IdentityForm = () => {
             component={Paper}
             sx={{ maxWidth: "60ch", marginTop: 4, p: 3, marginBottom: 4 }}
           >
-            <Typography variant="h6" component="h1" gutterBottom>
+            <Typography variant="h6" component="h1" gutterBottom={true}>
               Name of the identity
             </Typography>
             <TextField
               id="name"
               sx={{ width: "100%", marginBottom: 2 }}
               label="Name"
-              variant="standard"
+              variant={"standard"}
               value={identityName}
               onChange={(e) => {
                 setIdentityName(e.target.value);

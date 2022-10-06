@@ -25,6 +25,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Input from "@mui/material/Input";
 import status_switch from "../../helpers/status";
+import { useRouter } from "next/router";
 
 const initialState = {
   customerList: [],
@@ -315,7 +316,7 @@ const UnitForm = () => {
     <div className="unitsform__container">
       <div className="unitsform__content">
         <form>
-          <FormControl fullWidth>
+          <FormControl fullWidth={true}>
             <InputLabel>Status</InputLabel>
             <Select
               value={formData.status}
@@ -330,7 +331,7 @@ const UnitForm = () => {
               <MenuItem value="R">Review</MenuItem>
             </Select>
           </FormControl>
-          <FormControl fullWidth>
+          <FormControl fullWidth={true}>
             <InputLabel>Location</InputLabel>
             <Select
               onChange={(e) => {
@@ -344,7 +345,7 @@ const UnitForm = () => {
               })}
             </Select>
           </FormControl>
-          <FormControl fullWidth>
+          <FormControl fullWidth={true}>
             <InputLabel>Identity</InputLabel>
             <Select
               onChange={(e) => {
@@ -363,7 +364,7 @@ const UnitForm = () => {
               />
             ) : null}
           </FormControl>
-          <FormControl fullWidth>
+          <FormControl fullWidth={true}>
             <ButtonGroup>
               <Button
                 variant="outlined"
@@ -396,7 +397,8 @@ const UnitsTopBar = () => {
 const Units = () => {
   const [error, setError] = React.useState(false);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { id } = useParams("id");
+  const router = useRouter();
+  const { id } = router.query;
   // initialize customer list
   React.useEffect(() => {
     Axios.get("/api/customers/" + id)

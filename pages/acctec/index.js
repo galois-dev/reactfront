@@ -23,14 +23,14 @@ export const Scan = () => {
       <div className="scan_container">
         <RoundBox sx={{ p: 2 }}>
           <div>
-            <Typography variant="h5" align="center" gutterBottom="true">
+            <Typography variant="h5" align="center" gutterBottom={true}>
               Scan RFID
             </Typography>
             <div>
               <TextField
-                focused="true"
-                autoFocus="true"
-                required="true"
+                focused={true}
+                autoFocus={true}
+                required={true}
                 variant="outlined"
                 value={RFID}
                 onChange={(e) => setRFID(e.target.value)}
@@ -50,7 +50,7 @@ export const Scan = () => {
                   postRFID();
                 }}
               >
-                <Typography variant="h6" align="center" gutterBottom="true">
+                <Typography variant="h6" align="center" gutterBottom={true}>
                   ENTER
                 </Typography>
               </Button>

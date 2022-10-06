@@ -452,7 +452,11 @@ const SubscriptionBadge = ({ subscription }) => {
     <Card sx={{ minWidth: 125 }}>
       <ErrorBoundary FallbackComponent={ErrorHandler}>
         <CardContent>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography
+            sx={{ fontSize: 14 }}
+            color="text.secondary"
+            gutterBottom={true}
+          >
             Subscription Status
           </Typography>
           <Typography variant="h5" component="div">

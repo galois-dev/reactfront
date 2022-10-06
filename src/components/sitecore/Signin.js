@@ -75,17 +75,17 @@ export default function SignIn() {
             <TextField
               margin="normal"
               required
-              fullWidth
+              fullWidth={true}
               id="email"
               label="Email Address"
               name="email"
               autoComplete="email"
-              autoFocus
+              autoFocus={true}
             />
             <TextField
               margin="normal"
               required
-              fullWidth
+              fullWidth={true}
               name="password"
               label="Password"
               type="password"
@@ -98,7 +98,7 @@ export default function SignIn() {
             />
             <Button
               type="submit"
-              fullWidth
+              fullWidth={true}
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >

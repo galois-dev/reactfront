@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Axios } from "./index";
+import { Axios } from "../pages/index";
 import { useRouter } from "next/router";
 import { IdentityJsonbView } from "../src/components/Units/Unit";
 import {
@@ -15,7 +15,7 @@ import {
 import TextField from "@mui/material/TextField";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { TabPanel } from "./Users";
+import { TabPanel } from "../pages/Users";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -37,30 +37,30 @@ import IconButton from "@mui/material/IconButton";
 import Rating from "@mui/material/Rating";
 import RoundBox from "@components/sitecore/RoundBox";
 
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
-  props,
-  ref
-) {
-  const { onChange, ...other } = props;
+// const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
+//   props,
+//   ref
+// ) {
+//   const { onChange, ...other } = props;
 
-  return (
-    <NumberFormat
-      {...other}
-      getInputRef={ref}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        });
-      }}
-      thousandSeparator
-      isNumericString
-      prefix="$"
-    />
-  );
-});
+//   return (
+//     <NumberFormat
+//       {...other}
+//       getInputRef={ref}
+//       onValueChange={(values) => {
+//         onChange({
+//           target: {
+//             name: props.name,
+//             value: values.value,
+//           },
+//         });
+//       }}
+//       thousandSeparator
+//       isNumericString
+//       prefix="$"
+//     />
+//   );
+// });
 
 const InitialFormData = {
   default_string: {
@@ -401,7 +401,6 @@ const IdentityForm = () => {
               <Tab label="Types"></Tab>
               <Tab label={"Fields: " + fieldArray.length}></Tab>
             </Tabs>
-
             <TabPanel value={tabRoute} index={0}>
               <List sx={{ padding: 0 }}>
                 <ListItemButton
@@ -513,7 +512,7 @@ const IdentityForm = () => {
           >
             <div className="IdentityFormInput">
               {/* --- ALL BEFORE --- */}
-              <FormControl fullWidth variant="standard">
+              <FormControl fullWidth={true} variant={"standard"}>
                 <TextField
                   id="standard-basic"
                   label="Field Name"
@@ -559,7 +558,7 @@ const IdentityForm = () => {
                   identityFieldType === "string" ? "active" : "hidden"
                 }`}
               >
-                <FormControl FormControl fullWidth variant="standard">
+                <FormControl fullWidth={true} variant={"standard"}>
                   <span className="UnitFormInput__SingleFile">
                     <TextField
                       id="standard-basic"
@@ -575,14 +574,14 @@ const IdentityForm = () => {
                   </span>
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
                     display: "grid",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -602,9 +601,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max_char
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -779,7 +775,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -787,7 +783,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -803,9 +799,6 @@ const IdentityForm = () => {
                         onChange={handleChangeFieldParam}
                         value={formData["default_" + identityFieldType].default}
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -813,7 +806,7 @@ const IdentityForm = () => {
                   />
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -821,7 +814,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -839,9 +832,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.min
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -863,9 +853,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -881,7 +868,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -889,7 +876,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -905,9 +892,6 @@ const IdentityForm = () => {
                         onChange={handleChangeFieldParam}
                         value={formData["default_" + identityFieldType].default}
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -915,7 +899,7 @@ const IdentityForm = () => {
                   />
                 </FormControl>
                 <FormControl
-                  fullWidth
+                  fullWidth={true}
                   sx={{
                     m: 1,
                     width: "auto",
@@ -923,7 +907,7 @@ const IdentityForm = () => {
                     flexDirection: "row",
                     justifyContent: "center",
                   }}
-                  variant="standard"
+                  variant={"standard"}
                 >
                   <FormControlLabel
                     sx={{
@@ -941,9 +925,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.min
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -965,9 +946,6 @@ const IdentityForm = () => {
                           formData["default_" + identityFieldType].meta.max
                         }
                         id="outlined-adornment-weight"
-                        inputProps={{
-                          inputComponent: NumberFormatCustom,
-                        }}
                         aria-describedby="outlined-weight-helper-text"
                       />
                     }
@@ -1016,9 +994,6 @@ const IdentityForm = () => {
                       onChange={handleChangeFieldParam}
                       value={formData["default_" + identityFieldType].meta.max}
                       id="outlined-adornment-weight"
-                      inputProps={{
-                        inputComponent: NumberFormatCustom,
-                      }}
                       aria-describedby="outlined-weight-helper-text"
                     />
                   </div>
@@ -1108,7 +1083,7 @@ const IdentityForm = () => {
             component={Paper}
             sx={{ maxWidth: "60ch", marginTop: 4, p: 3, marginBottom: 4 }}
           >
-            <Typography variant="h6" component="h1" gutterBottom>
+            <Typography variant="h6" component="h1" gutterBottom={true}>
               Name of the identity
             </Typography>
             <TextField
@@ -1156,10 +1131,11 @@ const IdentityForm = () => {
   );
 };
 
-export const Identity = ({}) => {
+let Identity = ({}) => {
   // get identity from api
   const [identity, setIdentity] = React.useState({});
-  const { id } = useParams("id");
+  const router = useRouter();
+  const { id } = router.query;
 
   React.useEffect(() => {
     if (id !== undefined) {

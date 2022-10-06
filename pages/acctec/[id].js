@@ -169,7 +169,7 @@ export const ScanPK = () => {
               <TagMetaHeader tag={response} />
               <RoundBox sx={{ p: 2 }}>
                 <FormControl>
-                  <Typography variant="h5" align="center" gutterBottom="true">
+                  <Typography variant="h5" align="center" gutterBottom={true}>
                     Enter group
                   </Typography>
                   <Box
@@ -254,13 +254,13 @@ export const ScanPK = () => {
           false: (
             <Container fixed>
               <RoundBox sx={{ p: 2 }}>
-                <Typography variant="h4" align="center" gutterBottom="true">
+                <Typography variant="h4" align="center" gutterBottom={true}>
                   Set up tag with id {id}
                 </Typography>
               </RoundBox>
               <RoundBox sx={{ p: 2 }}>
                 <FormControl>
-                  <Typography variant="h5" align="center" gutterBottom="true">
+                  <Typography variant="h5" align="center" gutterBottom={true}>
                     Enter group
                   </Typography>
                   <Box
@@ -300,7 +300,7 @@ export const ScanPK = () => {
                         <Typography
                           variant="h5"
                           align="center"
-                          gutterBottom="true"
+                          gutterBottom={true}
                         >
                           Accept new tag
                         </Typography>

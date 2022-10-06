@@ -30,6 +30,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import LocationView from "../src/components/HR/Location.js";
 import status_switch from "../src/helpers/status";
 import RoundBox from "@components/sitecore/RoundBox";
+import { useRouter } from "next/router";
 const initialState = {
   customerList: [],
   current_customer: {},
@@ -117,7 +118,8 @@ function ErrorHandler({ error }) {
 
 const CustomerView = ({}) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { id } = useParams("id");
+  const router = useRouter();
+  const { id } = router.query;
 
   React.useEffect(() => {
     Axios.get("api/customers/" + id).then((res) => {
@@ -450,7 +452,11 @@ const SubscriptionBadge = ({ subscription }) => {
     <Card sx={{ minWidth: 125 }}>
       <ErrorBoundary FallbackComponent={ErrorHandler}>
         <CardContent>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography
+            sx={{ fontSize: 14 }}
+            color="text.secondary"
+            gutterBottom={true}
+          >
             Subscription Status
           </Typography>
           <Typography variant="h5" component="div">
