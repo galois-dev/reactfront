@@ -2,7 +2,8 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-template-rows: 248px 1fr auto;
-  margin-top: 3em;
+  margin-top: 1em;
+  margin-bottom: 2em;
   align-items: center;
   grid-template-areas:
     "profile info"

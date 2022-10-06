@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Axios } from "./index";
+import { Axios } from "../index";
 import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
@@ -14,7 +14,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Link, useRoutes } from "react-router-dom";
 import { ButtonGroup, ListSubheader } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -24,10 +23,11 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Input from "@mui/material/Input";
-import Unit from "../src/components/Units/Unit";
-import status_switch from "../src/helpers/status";
-import { useNavigate } from "react-router-dom";
-import usePersistedReducer from "../src/helpers/hooks";
+import Unit from "../../src/components/Units/Unit";
+import status_switch from "../../src/helpers/status";
+import { useRouter } from "next/router";
+import usePersistedReducer from "../../src/helpers/hooks";
+import RoundBox from "@components/sitecore/RoundBox";
 const initialState = {
   customerList: [],
   selectedCustomer: {},
@@ -115,7 +115,7 @@ const IdentityListView = () => {
   const handleChange = (event) => {
     setIdentity(event.target.value);
   };
-  const navigate = useNavigate();
+  const router = useRouter();
 
   React.useEffect(() => {
     Axios.get("/api/unit_identities")
@@ -129,73 +129,85 @@ const IdentityListView = () => {
 
   function HandleClick(id) {
     // Sends over to customers unit page
-    navigate(`/Units/Identity/${id}`, { replace: true });
+    router.push(`/Units/Identity/${id}`);
   }
 
   function HandleAdd() {
     // Sends over to customers unit page
-    navigate(`/Units/Identity`, { replace: true });
+    router.push(`/Units/Identity`);
   }
 
   return (
-    <div className="IdentityList">
-      <div className="IdentityListHeader">
-        <h2>Identities</h2>
-      </div>
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Identity</TableCell>
-              <TableCell align="right" width={50}>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    HandleAdd();
-                  }}
-                >
-                  Add
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {state.IdentityList.map((identity) => (
-              <TableRow
-                key={identity.id}
-                hover
-                onClick={(event) => HandleClick(identity.id)}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {identity.name}
+    <RoundBox
+      sx={{
+        width: "100%",
+        maxHeight: 400,
+        pt: 0.1,
+        mt: 2,
+        bgcolor: "background.paper",
+      }}
+    >
+      <div className="IdentityList">
+        <div className="IdentityListHeader">
+          <h2>Identities</h2>
+        </div>
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Identity</TableCell>
+                <TableCell align="right" width={50}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      HandleAdd();
+                    }}
+                  >
+                    Add
+                  </Button>
                 </TableCell>
-                <TableCell></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+            </TableHead>
+            <TableBody>
+              {state.IdentityList.map((identity) => (
+                <TableRow
+                  key={identity.id}
+                  hover
+                  onClick={(event) => HandleClick(identity.id)}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {identity.name}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+    </RoundBox>
   );
 };
 
 export const CustomerList = () => {
   const { state, dispatch } = React.useContext(StateContext);
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   function HandleClick(id) {
     // Sends over to customers unit page
-    navigate(`/Units/Customer/${id}`, { replace: true });
+    router.push(`/Customer/${id}`);
   }
 
   if (state.customerList.length === 0) {
     return (
-      <Box
+      <RoundBox
         sx={{
           width: "100%",
           maxHeight: 400,
+          pt: 0.1,
+          mt: 2,
           bgcolor: "background.paper",
         }}
       >
@@ -214,15 +226,17 @@ export const CustomerList = () => {
             </TableHead>
           </Table>
         </TableContainer>
-      </Box>
+      </RoundBox>
     );
   }
 
   return (
-    <Box
+    <RoundBox
       sx={{
         width: "100%",
         maxHeight: 400,
+        pt: 0.1,
+        mt: 2,
         bgcolor: "background.paper",
       }}
     >
@@ -258,11 +272,11 @@ export const CustomerList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </RoundBox>
   );
 };
 
-const Units = () => {
+export default function Units() {
   const [error, setError] = React.useState(false);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   // initialize customer list
@@ -283,6 +297,4 @@ const Units = () => {
       </Container>
     </StateContext.Provider>
   );
-};
-
-export default Units;
+}

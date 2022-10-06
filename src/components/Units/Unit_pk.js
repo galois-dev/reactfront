@@ -15,7 +15,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Link, useRoutes } from "react-router-dom";
 import { ButtonGroup, ListSubheader } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -26,7 +25,6 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Input from "@mui/material/Input";
 import status_switch from "../../helpers/status";
-import { useNavigate, useParams } from "react-router-dom";
 
 const initialState = {
   customerList: [],

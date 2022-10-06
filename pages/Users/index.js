@@ -1,5 +1,4 @@
 import * as React from "react";
-import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
@@ -7,41 +6,11 @@ import Box from "@mui/material/Box";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Axios } from "./index";
+import { Axios } from "@pages/index";
+import { TabPanel } from "@components/sitecore/TabPanel";
 import TextField from "@mui/material/TextField";
-import { useNavigate } from "react-router-dom";
-
-export function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+import { useRouter } from "next/router";
+import RoundBox from "@components/sitecore/RoundBox";
 
 const columns = [
   { field: "id", headerName: "ID", width: 70 },
@@ -57,11 +26,18 @@ const columns = [
   },
 ];
 
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
 const Users = ({}) => {
-  const [value, setValue] = React.useState("0");
+  const [value, setValue] = React.useState(0);
   const [users, setUsers] = React.useState([]);
   const [error, setError] = React.useState(false);
-  const navigate = useNavigate();
+  const navigate = useRouter();
 
   React.useEffect(() => {
     Axios.get("/users")
@@ -94,12 +70,12 @@ const Users = ({}) => {
   };
 
   const handleRowClick = ({ columns, getValue, id, row }) => {
-    navigate(`../users/${row.id}`, { replace: false });
+    navigate.push(`../users/${row.id}`, { replace: false });
   };
 
   return (
     <Container fixed maxWidth="xl">
-      <Box sx={{ width: "100%", bgcolor: "#ffffff" }}>
+      <RoundBox sx={{ width: "100%", bgcolor: "#ffffff" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={value}
@@ -110,7 +86,7 @@ const Users = ({}) => {
             <Tab label="Staff Users" {...a11yProps(1)} />
           </Tabs>
         </Box>
-        <TabPanel value={value} index={"0"}>
+        <TabPanel value={value} index={0}>
           <div style={{ width: "100%" }}>
             {/* <TextField
               style={{ marginBottom: "1.2em" }}
@@ -129,7 +105,7 @@ const Users = ({}) => {
             />
           </div>
         </TabPanel>
-        <TabPanel value={value} index={"1"}>
+        <TabPanel value={value} index={1}>
           <div style={{ width: "100%" }}>
             {/* <TextField
               style={{ marginBottom: "1.2em" }}
@@ -147,7 +123,7 @@ const Users = ({}) => {
             />
           </div>
         </TabPanel>
-      </Box>
+      </RoundBox>
     </Container>
   );
 };

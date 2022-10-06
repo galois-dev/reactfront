@@ -48,7 +48,7 @@ const NavLink = ({ to, icon, children }) => {
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   alignItems: "flex-start",
   paddingTop: theme.spacing(1),
-  paddingBottom: theme.spacing(2),
+  paddingBottom: theme.spacing(1),
   // Override media queries injected by theme.mixins.toolbar
   "@media all": {
     minHeight: 128,
@@ -83,28 +83,35 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  if (
-    typeof window !== "undefined" &&
-    ["login", "signup", "reset"].includes(
-      window.location.pathname.split("/")[1].toLowerCase()
-    )
-  ) {
-    return <></>;
-  }
+  React.useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      ["login", "signup", "reset"].includes(
+        window.location.pathname.split("/")[1].toLowerCase()
+      )
+    ) {
+      return setOpen(false);
+    } else {
+      return setOpen(true);
+    }
+  }, [nav.pathname]);
 
   return (
     <AppBar position="fixed" open={open}>
       <Drawer
+        ModalProps={{
+          keepMounted: true,
+        }}
         open={open}
         sx={{
-          width: 200,
+          width: "250px",
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 200,
+            width: "250px",
             boxSizing: "border-box",
           },
         }}
-        variant="permanent"
+        variant="persistent"
         anchor="left"
       >
         <Toolbar
@@ -151,7 +158,7 @@ const Navbar = () => {
                 >
                   <ListItemText primary="AccTec" />
                 </MenuItem>
-                <MenuItem
+                {/* <MenuItem
                   sx={{ pl: 4 }}
                   align="left"
                   onClick={() => {
@@ -159,19 +166,19 @@ const Navbar = () => {
                   }}
                 >
                   <ListItemText primary="SIM" />
-                </MenuItem>
+                </MenuItem> */}
               </List>
             </Collapse>
 
-            <ListItemButton
+            {/* <ListItemButton
               onClick={() => {
                 setOpenPDF(!openPDF);
               }}
             >
               <ListItemText primary="PDF" />
               {openPDF ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openPDF} timeout="auto" unmountOnExit>
+            </ListItemButton> */}
+            {/* <Collapse in={openPDF} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <MenuItem
                   sx={{ pl: 4 }}
@@ -192,12 +199,12 @@ const Navbar = () => {
                   <ListItemText primary="Forholdsordre" />
                 </MenuItem>
               </List>
-            </Collapse>
+            </Collapse> */}
           </Box>
 
           <Tooltip title="Open settings">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              {/* <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" /> */}
             </IconButton>
           </Tooltip>
 

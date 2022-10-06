@@ -1,10 +1,8 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { Axios } from "./index";
-import { useNavigate } from "react-router-dom";
+import { Axios } from "../pages/index";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
@@ -31,7 +29,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationView from "../src/components/HR/Location.js";
 import status_switch from "../src/helpers/status";
-
+import RoundBox from "@components/sitecore/RoundBox";
 const initialState = {
   customerList: [],
   current_customer: {},
@@ -156,7 +154,7 @@ const CustomerView = ({}) => {
   return (
     <StateContext.Provider value={{ state, dispatch }}>
       <Container fixed>
-        <Box sx={{ width: "100%", bgcolor: "#ffffff" }}>
+        <RoundBox sx={{ width: "100%", bgcolor: "#ffffff" }}>
           <ErrorBoundary FallbackComponent={ErrorHandler}>
             <div className="CustomerView__container">
               <div className="CustomerView__profile">
@@ -215,7 +213,7 @@ const CustomerView = ({}) => {
               </div>
             </div>
           </ErrorBoundary>
-        </Box>
+        </RoundBox>
       </Container>
     </StateContext.Provider>
   );
@@ -233,9 +231,9 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <RoundBox sx={{ p: 3 }}>
           <Typography>{children}</Typography>
-        </Box>
+        </RoundBox>
       )}
     </div>
   );
@@ -257,14 +255,14 @@ const CustomerLocationTabs = ({ locations }) => {
   }
 
   return (
-    <Box className="CustomerListsTabs">
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+    <RoundBox className="CustomerListsTabs">
+      <RoundBox sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} variant="scrollable">
           {locations.map((location, index) => {
             return <Tab label={location.address} key={index} />;
           })}
         </Tabs>
-      </Box>
+      </RoundBox>
       {locations.map((location, index) => {
         return (
           <TabPanel value={value} index={index} key={String(index)}>
@@ -272,7 +270,7 @@ const CustomerLocationTabs = ({ locations }) => {
           </TabPanel>
         );
       })}
-    </Box>
+    </RoundBox>
   );
 };
 
@@ -300,14 +298,14 @@ const CustomerUserList = ({ users }) => {
   }
 
   return (
-    <Box sx={{ bgcolor: "#ffffff" }}>
+    <RoundBox sx={{ bgcolor: "#ffffff" }}>
       <Modal
         open={modalOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box
+        <RoundBox
           sx={{
             position: "absolute",
             top: "50%",
@@ -316,7 +314,7 @@ const CustomerUserList = ({ users }) => {
             width: 400,
             bgcolor: "whitesmoke",
             border: "2px solid #000",
-            boxShadow: 24,
+            RoundBoxShadow: 24,
             p: 4,
           }}
         >
@@ -326,7 +324,7 @@ const CustomerUserList = ({ users }) => {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </Typography>
-        </Box>
+        </RoundBox>
       </Modal>
       <TableContainer
         component={Paper}
@@ -408,20 +406,20 @@ const CustomerUserList = ({ users }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </RoundBox>
   );
 };
 
 const CustomerLocationList = ({ locations }) => {
   return (
-    <Box sx={{ width: "100%", height: "350px", bgcolor: "#ffffff" }}>
+    <RoundBox sx={{ width: "100%", height: "350px", bgcolor: "#ffffff" }}>
       <DataGrid
         autoheight
         rows={locations}
         columns={LocationColumns}
         rowsPerPageOptions={[15, 25, 50, 100, 500, 1000]}
       />
-    </Box>
+    </RoundBox>
   );
 };
 

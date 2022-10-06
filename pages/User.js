@@ -1,9 +1,9 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useRouter, useParam } from "next/router";
 import { Axios } from "./index";
 
 const User = ({}) => {
-  let { id } = useParams();
+  let { id } = useParam();
   let [data, setData] = React.useState();
 
   React.useEffect(() => {

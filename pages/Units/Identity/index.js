@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Axios } from "./index";
+import { Axios } from "@pages/index";
 import { useRouter } from "next/router";
-import { IdentityJsonbView } from "../src/components/Units/Unit";
+import { IdentityJsonbView } from "@components/Units/IdentityJsonbView";
 import {
   ListItemButton,
   List,
@@ -15,7 +15,7 @@ import {
 import TextField from "@mui/material/TextField";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { TabPanel } from "./Users";
+import { TabPanel } from "@components/sitecore/TabPanel";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -35,7 +35,6 @@ import TableRow from "@mui/material/TableRow";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import Rating from "@mui/material/Rating";
-import RoundBox from "@components/sitecore/RoundBox";
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
@@ -396,7 +395,7 @@ const IdentityForm = () => {
       <div className="IdentityForm">
         {/* add MUI list of field types [text, string, single_choice, multiple_choice, number, integer, rating, file, image, location] */}
         <div className="IdentityTypeList">
-          <RoundBox sx={{ padding: 0, m: 0 }}>
+          <Box sx={{ padding: 0, m: 0 }}>
             <Tabs value={tabRoute} onChange={handleChangeTabRoute}>
               <Tab label="Types"></Tab>
               <Tab label={"Fields: " + fieldArray.length}></Tab>
@@ -504,7 +503,7 @@ const IdentityForm = () => {
                 })}
               </List>
             </TabPanel>
-          </RoundBox>
+          </Box>
         </div>
         <div className={fieldIndex === -1 && tabRoute !== 0 ? "hidden" : ""}>
           <Container
@@ -639,7 +638,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <div className="IdentityForm__single_choice">
-                  <RoundBox sx={{ m: 1, display: "flex" }}>
+                  <Box sx={{ m: 1, display: "flex" }}>
                     <TextField
                       id="standard-basic"
                       label="Add Choice"
@@ -658,7 +657,7 @@ const IdentityForm = () => {
                     >
                       Add
                     </Button>
-                  </RoundBox>
+                  </Box>
                   <TableContainer sx={{ m: 1, marginTop: 3 }}>
                     <Table size="small">
                       <TableHead>
@@ -709,7 +708,7 @@ const IdentityForm = () => {
                 }`}
               >
                 <div className="IdentityForm__single_choice">
-                  <RoundBox sx={{ m: 1, display: "flex" }}>
+                  <Box sx={{ m: 1, display: "flex" }}>
                     <TextField
                       id="standard-basic"
                       label="Add Choice"
@@ -728,7 +727,7 @@ const IdentityForm = () => {
                     >
                       Add
                     </Button>
-                  </RoundBox>
+                  </Box>
                   <TableContainer sx={{ m: 1, marginTop: 3 }}>
                     <Table size="small">
                       <TableHead>
@@ -1159,7 +1158,8 @@ const IdentityForm = () => {
 export const Identity = ({}) => {
   // get identity from api
   const [identity, setIdentity] = React.useState({});
-  const { id } = useParams("id");
+  const router = useRouter();
+  const { id } = router.query;
 
   React.useEffect(() => {
     if (id !== undefined) {

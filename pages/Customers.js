@@ -1,10 +1,8 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { Axios } from "./index";
-import { useNavigate } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
@@ -12,7 +10,9 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
-
+import CustomerForm from "@components/sitecore/CustomerForm";
+import RoundBox from "@components/sitecore/RoundBox";
+import { useRouter } from "next/router";
 const initialState = {
   customerList: [],
 };
@@ -38,14 +38,14 @@ const columns = [
 
 const CustomerListSelector = ({}) => {
   const { state, dispatch } = React.useContext(StateContext);
-  const navigate = useNavigate();
+  const navigate = useRouter();
 
   function handleRowClick({ columns, getValue, id, row }) {
-    navigate(`/Customers/${row.id}`, { replace: true });
+    navigate.push(`/Customer/${row.id}`);
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#ffffff" }}>
+    <RoundBox>
       <DataGrid
         autoHeight
         rows={state.customerList}
@@ -55,7 +55,7 @@ const CustomerListSelector = ({}) => {
           handleRowClick(e);
         }}
       />
-    </Box>
+    </RoundBox>
   );
 };
 
@@ -79,6 +79,7 @@ const Customers = ({}) => {
     <StateContext.Provider value={{ state, dispatch }}>
       <Container fixed>
         <CustomerListSelector />
+        <CustomerForm />
       </Container>
     </StateContext.Provider>
   );
