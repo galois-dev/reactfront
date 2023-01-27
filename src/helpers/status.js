@@ -1,4 +1,4 @@
-let status_switch = (params) => {
+export let status_switch = (params) => {
   switch (params) {
     case "A":
       return "Active";
@@ -8,5 +8,4 @@ let status_switch = (params) => {
       return "Not Found";
   }
 };
-
 export default status_switch;

@@ -214,6 +214,7 @@ const IdentityForm = () => {
   function addItemToList() {
     let choice = formData["default_" + identityFieldType].pre_new_choice;
     let choices = [...formData["default_" + identityFieldType].meta.choices];
+
     if (choice && !choices.some((item) => item.value === choice)) {
       choices.push({ value: choice, id: choices.length + 1, default: false });
       formData["default_" + identityFieldType].meta.choices = choices;

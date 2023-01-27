@@ -115,7 +115,12 @@ const Navbar = () => {
         anchor="left"
       >
         <Toolbar
-          sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            color: "primary",
+          }}
         >
           <Typography
             variant="h6"

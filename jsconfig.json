@@ -1,13 +1,14 @@
 {
-    "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-        "@*": ["src/*"],
-        "@/*": ["src/*"],
-        "@components/*": ["src/components/*"],
-        "@pages/*": ["pages/*"],
-      },
-      "checkJs": false,
-      "jsx": "react"
-    }
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@*": ["src/*"],
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["pages/*"],
+      "@styles": ["src/styles/*"]
+    },
+    "checkJs": false,
+    "jsx": "react"
   }
+}

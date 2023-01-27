@@ -7,3 +7,13 @@
     width: 100%;
     margin-top: 30vh;
 }
+
+.TimeTableContainer {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    grid-template-rows: 26px auto;
+    grid-template-areas: 
+    "whitespace days days days days days days days"
+    "timestamps week week week week week week week";
+    gap: 1em;
+}

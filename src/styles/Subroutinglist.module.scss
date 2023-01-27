@@ -1,0 +1,108 @@
+@import "./variables.scss";
+
+.container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    gap: 1em;
+}
+
+@keyframes expand {
+    0% {
+      transform: width(100px);
+    }
+    99% {
+      transform: width(400px);
+    }
+    100% {
+      transform: width(400px);
+    }
+  }
+
+@keyframes expandChild {
+    0% {
+      transform: visibility(hidden);
+    }
+    99% {
+      display: block;
+      transform: visibility(visible);
+
+    }
+    100% {
+      transform: visibility(visible);
+   }
+  }
+
+.pill{
+    width: 100px;
+    height: 400px;
+    padding: 10px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 0px;    
+    grid-template-areas: "ikon text"
+        "title text";
+    justify-content: left;
+    align-items: center;
+
+    :nth-child(4){
+        visibility: hidden;
+    }
+    :nth-child(1){
+        align-self: end;
+    }
+    :nth-child(2){
+        align-self: start;
+    }
+    &[data-expanded="false"]{
+        // animation: expand;
+        background-color: map-get($palette,"primary", "main");
+        :nth-child(4){
+            visibility: hidden;
+            opacity: 0.0            
+        }
+    }
+    &[data-expanded="true"]{
+        // animation: expand;
+        background-color: map-get($palette,"primary", "dark");
+        grid-template-columns: 1fr 4fr;
+        width: 400px;
+        column-gap: 0.7em;
+        :nth-child(2){
+            grid-area: title;
+            // Dont ask it just works(tm).
+            transition: transform 0.3s linear; 
+            transform: translate(-300px, 0px);
+            transform: translate(0px,0px);
+        }
+        :nth-child(4){
+            visibility: visible;
+            transition: visibility 0.3s 0.3s linear;
+            transition: opacity 0.2s 0.4s linear;
+            opacity: 1;
+        }
+    }
+}
+
+.icon_container{
+    grid-area: ikon;
+}
+.title_container{
+    grid-area: title;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #000;
+}
+
+
+.text_container{
+    grid-area: text;
+    font-size: 1em;
+    color: #000;
+}

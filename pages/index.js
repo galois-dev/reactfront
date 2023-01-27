@@ -1,7 +1,10 @@
 import * as React from "react";
 import Container from "@mui/material/Container";
 import axios from "axios";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+// import { StyledEngineProvider } from "@mui/material/styles";
+import { useTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { useRouter } from "next/router";
+
 // import {
 //   Routes,
 //   Route,
@@ -18,7 +21,8 @@ import {
 } from "../src/helpers/auth.js";
 import Navbar from "../src/components/sitecore/Navbar.js";
 
-const API_URL = "https://whale-app-tv6wx.ondigitalocean.app/";
+// const API_URL = "https://whale-app-tv6wx.ondigitalocean.app/";
+const API_URL = "https://localhost:8000/";
 export const Axios = axios.create({
   baseURL: API_URL,
   timeout: 1000,
@@ -52,41 +56,68 @@ const refreshAccessToken = async () => {
   return res.data.access;
 };
 
-// Response interceptor for API calls
 Axios.interceptors.response.use(
   (response) => {
     return response;
   },
   async function (error) {
-    console.log(error);
     let originalRequest = error.config;
     if (
-      error.response.status === 401 &&
+      error?.response?.status === 401 &&
       originalRequest._retry !== true &&
       typeof window !== "undefined"
     ) {
-      originalRequest["_retry"] = true;
-      refreshAccessToken()
-        .then((token) => {
-          localStorage.setItem("access_token", token);
-          Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-          return Axios(originalRequest);
-        })
-        .catch((err) => {
-          window.location.pathname = "/login";
-        });
-    } else {
-      if (
-        error?.response?.status === 401 ||
-        (originalRequest._retry === true && typeof window !== "undefined")
-      ) {
+      try {
+        let token = await refreshAccessToken();
+        originalRequest["_retry"] = true;
+        localStorage.setItem("access_token", token);
+        Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+        return Axios(originalRequest);
+      } catch (err) {
         window.location.pathname = "/login";
-        return await Promise.reject(error);
+        return Promise.reject(err);
       }
+    } else if (originalRequest._retry === true) {
+      window.location.pathname = "/login";
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
   }
 );
+// // Response interceptor for API calls
+// Axios.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   async function (error) {
+//     let originalRequest = error.config;
+//     if (
+//       error?.response?.status === 401 &&
+//       originalRequest._retry !== true &&
+//       typeof window !== "undefined"
+//     ) {
+//       refreshAccessToken()
+//         .then((token) => {
+//           originalRequest["_retry"] = true;
+//           localStorage.setItem("access_token", token);
+//           Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+//           return Axios(originalRequest);
+//         })
+//         .catch((err) => {
+//           window.location.pathname = "/login";
+//           return Promise.reject(err);
+//         });
+//     } else {
+//       if (
+//         error?.response?.status === 401 ||
+//         (originalRequest._retry === true && typeof window !== "undefined")
+//       ) {
+//         window.location.pathname = "/login";
+//         return Promise.reject(error);
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export const pages = [
   {
@@ -120,36 +151,35 @@ export const pages = [
 ];
 export const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-const theme = createTheme({
-  breakpoints: {
-    values: {
-      mobile: 0,
-      tablet: 640,
-      laptop: 1024,
-      desktop: 1200,
-    },
-  },
-});
-
 export function App({ children }) {
+  const theme = useTheme();
   const { setToken } = useGlobalContext() || {};
-
+  const router = useRouter();
   const user = retriveUserFromLocalStorage();
 
+  const style = {
+    pl: `${
+      ["login", "signup", "reset"].includes(
+        router.asPath.split("/")[1].toLowerCase()
+      )
+        ? "0px"
+        : "250px"
+    }`,
+  };
+
+  // if (router.asPath.split("/")[1].toLowerCase() === undefined) {
+  //   return <>loading...</>;
+  // }
+
   return (
+    // <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
       <AppProvider>
         <Container
+          maxWidth="xl"
           sx={{
-            pl: `${
-              typeof windows !== "undefined" &&
-              ["login", "signup", "reset"].includes(
-                window.location.pathname.split("/")[1].toLowerCase()
-              )
-                ? "0px"
-                : "250px"
-            }`,
-            pt: 3,
+            pl: style.pl + " !important",
+            pr: "0px !important",
             height: "100%",
           }}
         >
@@ -158,6 +188,7 @@ export function App({ children }) {
         </Container>
       </AppProvider>
     </ThemeProvider>
+    // </StyledEngineProvider>
   );
 }
 
