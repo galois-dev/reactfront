@@ -61,16 +61,12 @@
         align-self: start;
     }
     &[data-expanded="false"]{
-        // animation: expand;
-        background-color: map-get($palette,"primary", "main");
         :nth-child(4){
             visibility: hidden;
             opacity: 0.0            
         }
     }
     &[data-expanded="true"]{
-        // animation: expand;
-        background-color: map-get($palette,"primary", "dark");
         grid-template-columns: 1fr 4fr;
         width: 400px;
         column-gap: 0.7em;

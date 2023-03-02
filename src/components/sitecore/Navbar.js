@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
+import { alpha, styled } from "@mui/system";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
@@ -25,11 +25,29 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { blue, indigo, teal } from "@mui/material/colors";
+import {
+  ArrowBack,
+  CableOutlined,
+  CameraIndoor,
+  Group,
+  Home,
+  PeopleOutline,
+} from "@mui/icons-material";
+import { useTheme } from "@mui/material";
 
+const iconColor = indigo["100"];
+const fontColor = indigo["100"];
 const iconSwitch = (icon) => {
   switch (icon) {
     case "home":
-      return;
+      return <Home style={{ color: iconColor }} />;
+    case "cable":
+      return <CableOutlined style={{ color: iconColor }} />;
+    case "peopleOutline":
+      return <PeopleOutline style={{ color: iconColor }} />;
+    case "group":
+      return <Group style={{ color: iconColor }} />;
     default:
       break;
   }
@@ -55,7 +73,8 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   },
 }));
 
-const Navbar = () => {
+const Navbar = ({ setNavFold }) => {
+  const theme = useTheme();
   const { refreshToken } = useGlobalContext();
   const nav = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -63,6 +82,7 @@ const Navbar = () => {
   const [open, setOpen] = React.useState(true);
   const [openAPI, setOpenAPI] = React.useState(false);
   const [openPDF, setOpenPDF] = React.useState(false);
+  const [folded, setFolded] = React.useState(false);
   // #TODO: add condition to hide on login, signup and pwd reset pages.
 
   const redirectPage = (to) => nav.push(to);
@@ -81,6 +101,19 @@ const Navbar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  let style = {
+    drawer: {
+      transition: "width 150ms ease-in-out",
+      width: folded ? "76px" : "250px",
+      flexShrink: 0,
+      "& .MuiDrawer-paper": {
+        transition: "width 150ms ease-in-out",
+        width: folded ? "76px" : "250px",
+        boxSizing: "border-box",
+      },
+    },
   };
 
   React.useEffect(() => {
@@ -103,14 +136,7 @@ const Navbar = () => {
           keepMounted: true,
         }}
         open={open}
-        sx={{
-          width: "250px",
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: "250px",
-            boxSizing: "border-box",
-          },
-        }}
+        sx={style.drawer}
         variant="persistent"
         anchor="left"
       >
@@ -119,49 +145,100 @@ const Navbar = () => {
             display: "flex",
             flexDirection: "column",
             height: "100%",
-            color: "primary",
+            color: fontColor,
+            alignItems: "self-start",
+            backgroundColor: indigo["400"],
           }}
         >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ mt: 4, display: { xs: "none", md: "flex" } }}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: folded ? "column" : "row",
+              justifyContent: "space-between",
+              gap: folded ? "15px" : "0px",
+              width: "100%",
+              alignItems: "center",
+              mt: folded ? 2 : 4,
+              mb: 2,
+            }}
           >
-            LOGO
-          </Typography>
-
-          <Box sx={{ flexGrow: 2, width: 320, maxWidth: "100%" }}>
+            <div></div>
+            {folded ? (
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ display: { xs: "none", md: "flex" } }}
+              >
+                <img src="/favicon.ico" alt="logo" width="32" />
+              </Typography>
+            ) : (
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ display: { xs: "none", md: "flex" } }}
+              >
+                <img src="/jyskas.png" alt="logo" width="100" />
+              </Typography>
+            )}
+            <IconButton
+              sx={{ p: 0, m: 0, mr: "2px" }}
+              onClick={() => {
+                setFolded(!folded);
+                setNavFold(!folded);
+              }}
+            >
+              {folded ? (
+                <MenuIcon style={{ color: iconColor }} />
+              ) : (
+                <ArrowBack style={{ color: iconColor }} />
+              )}
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 2, width: "100%" }}>
             <MenuList>
               {pages.map((page) => (
                 <MenuItem
+                  fullWidth
+                  sx={{ p: folded ? 0 : 0.5, m: folded ? 0 : 0.5, pb: 1.5 }}
                   key={page.name}
                   onClick={() => {
                     redirectPage(page.to);
                   }}
                 >
-                  <ListItemText align="left" primary={page.name} />
+                  <ListItemIcon>{iconSwitch(page.icon)}</ListItemIcon>
+                  {folded ? null : (
+                    <ListItemText align="left" primary={page.name} />
+                  )}
                 </MenuItem>
               ))}
             </MenuList>
-
-            <ListItemButton
-              onClick={() => {
-                setOpenAPI(!openAPI);
-              }}
-            >
-              <ListItemText primary="Integrations" />
-              {openAPI ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openAPI} timeout="auto" unmountOnExit>
+            {folded ? null : (
+              <ListItemButton
+                onClick={() => {
+                  setOpenAPI(!openAPI);
+                }}
+              >
+                <ListItemText primary="Integrations" />
+                {openAPI ? (
+                  <ExpandLess style={{ color: iconColor }} />
+                ) : (
+                  <ExpandMore style={{ color: iconColor }} />
+                )}
+              </ListItemButton>
+            )}
+            <Collapse in={openAPI || folded} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <MenuItem
-                  sx={{ pl: 4 }}
+                  sx={{ pl: folded ? 0 : 3 }}
                   align="left"
                   onClick={() => {
                     redirectPage("/acctec");
                   }}
                 >
-                  <ListItemText primary="AccTec" />
+                  <ListItemIcon>
+                    <CameraIndoor style={{ color: iconColor }} />
+                  </ListItemIcon>
+                  {folded ? null : <ListItemText primary="AccTec" />}
                 </MenuItem>
                 {/* <MenuItem
                   sx={{ pl: 4 }}

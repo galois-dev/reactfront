@@ -3,5 +3,6 @@ const withPWA = require("next-pwa")({
 });
 
 module.exports = {
+  productionBrowserSourceMaps: true,
   // next.js config
 };

@@ -1,4 +1,17 @@
 export const time_delta_on_unit_time = (date, delta_scale = "day") => {
+  // check that date is a valid date
+  if (isNaN(new Date(date))) {
+    return "Invalid Date";
+  }
+  // check that delta_scale is a valid scale
+  if (
+    !["second", "minute", "hour", "day", "week", "month", "year"].includes(
+      delta_scale
+    )
+  ) {
+    return "Invalid Scale";
+  }
+
   let numerator = -1; // day default
   switch (delta_scale) {
     case "second":

@@ -4,6 +4,7 @@ import axios from "axios";
 // import { StyledEngineProvider } from "@mui/material/styles";
 import { useTheme, ThemeProvider, styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
+import { amber, indigo, teal } from "@mui/material/colors";
 
 // import {
 //   Routes,
@@ -20,6 +21,10 @@ import {
   retriveUserFromLocalStorage,
 } from "../src/helpers/auth.js";
 import Navbar from "../src/components/sitecore/Navbar.js";
+import { createTheme } from "@mui/material/styles";
+import { deepmerge } from "@mui/utils";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 
 // const API_URL = "https://whale-app-tv6wx.ondigitalocean.app/";
 const API_URL = "https://localhost:8000/";
@@ -56,34 +61,6 @@ const refreshAccessToken = async () => {
   return res.data.access;
 };
 
-Axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async function (error) {
-    let originalRequest = error.config;
-    if (
-      error?.response?.status === 401 &&
-      originalRequest._retry !== true &&
-      typeof window !== "undefined"
-    ) {
-      try {
-        let token = await refreshAccessToken();
-        originalRequest["_retry"] = true;
-        localStorage.setItem("access_token", token);
-        Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-        return Axios(originalRequest);
-      } catch (err) {
-        window.location.pathname = "/login";
-        return Promise.reject(err);
-      }
-    } else if (originalRequest._retry === true) {
-      window.location.pathname = "/login";
-      return Promise.reject(error);
-    }
-  }
-);
-// // Response interceptor for API calls
 // Axios.interceptors.response.use(
 //   (response) => {
 //     return response;
@@ -95,42 +72,73 @@ Axios.interceptors.response.use(
 //       originalRequest._retry !== true &&
 //       typeof window !== "undefined"
 //     ) {
-//       refreshAccessToken()
-//         .then((token) => {
-//           originalRequest["_retry"] = true;
-//           localStorage.setItem("access_token", token);
-//           Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-//           return Axios(originalRequest);
-//         })
-//         .catch((err) => {
-//           window.location.pathname = "/login";
-//           return Promise.reject(err);
-//         });
-//     } else {
-//       if (
-//         error?.response?.status === 401 ||
-//         (originalRequest._retry === true && typeof window !== "undefined")
-//       ) {
+//       try {
+//         let token = await refreshAccessToken();
+//         originalRequest["_retry"] = true;
+//         localStorage.setItem("access_token", token);
+//         Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+//         return Axios(originalRequest);
+//       } catch (err) {
 //         window.location.pathname = "/login";
-//         return Promise.reject(error);
+//         return Promise.reject(err);
 //       }
+//     } else if (originalRequest._retry === true) {
+//       window.location.pathname = "/login";
+//       return Promise.reject(error);
 //     }
-//     return Promise.reject(error);
 //   }
 // );
+// Response interceptor for API calls
+Axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async function (error) {
+    let originalRequest = error.config;
+    if (
+      error?.response?.status === 401 &&
+      originalRequest._retry !== true &&
+      typeof window !== "undefined"
+    ) {
+      refreshAccessToken()
+        .then((token) => {
+          originalRequest["_retry"] = true;
+          localStorage.setItem("access_token", token);
+          Axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+          return Axios(originalRequest);
+        })
+        .catch((err) => {
+          window.location.pathname = "/login";
+          return Promise.reject(err);
+        });
+    } else {
+      if (
+        error?.response?.status === 401 ||
+        (originalRequest._retry === true && typeof window !== "undefined")
+      ) {
+        window.location.pathname = "/login";
+        return Promise.reject(error);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const pages = [
   {
     to: "/",
     name: "Home",
+    icon: "home",
   },
   {
     to: "/Units",
     name: "Units",
+    icon: "cable",
   },
   {
     to: "/Customers",
     name: "Customers",
+    icon: "peopleOutline",
   },
   // {
   //   to: "/Tasks",
@@ -143,6 +151,7 @@ export const pages = [
   {
     to: "/Users",
     name: "Users",
+    icon: "group",
   },
   // {
   //   to: "/acctec",
@@ -151,20 +160,44 @@ export const pages = [
 ];
 export const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
+let theme = createTheme({
+  palette: {
+    primary: {
+      main: indigo[400],
+      light: indigo[100],
+      dark: indigo[900],
+    },
+    secondary: {
+      main: amber[400],
+      light: amber[100],
+      dark: amber[900],
+    },
+  },
+});
+
 export function App({ children }) {
-  const theme = useTheme();
   const { setToken } = useGlobalContext() || {};
   const router = useRouter();
   const user = retriveUserFromLocalStorage();
+  const [navFold, setNavFold] = React.useState(false);
 
-  const style = {
-    pl: `${
-      ["login", "signup", "reset"].includes(
-        router.asPath.split("/")[1].toLowerCase()
-      )
-        ? "0px"
-        : "250px"
-    }`,
+  let pl_val = "250px";
+  if (
+    ["login", "signup", "reset"].includes(
+      router.asPath.split("/")[1].toLowerCase()
+    )
+  ) {
+    pl_val = "0px";
+  } else {
+    if (navFold) {
+      pl_val = "64px";
+    } else {
+      pl_val = "250px";
+    }
+  }
+
+  let style = {
+    pl: pl_val,
   };
 
   // if (router.asPath.split("/")[1].toLowerCase() === undefined) {
@@ -172,23 +205,24 @@ export function App({ children }) {
   // }
 
   return (
-    // <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
       <AppProvider>
-        <Container
-          maxWidth="xl"
-          sx={{
-            pl: style.pl + " !important",
-            pr: "0px !important",
-            height: "100%",
-          }}
-        >
-          <Navbar />
-          <div>{children}</div>
-        </Container>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Container
+            maxWidth="xl"
+            sx={{
+              transition: "padding-left 150ms ease-in-out",
+              pl: style.pl + " !important",
+              pr: "0px !important",
+              height: "100%",
+            }}
+          >
+            <Navbar setNavFold={setNavFold} />
+            <div>{children}</div>
+          </Container>
+        </LocalizationProvider>
       </AppProvider>
     </ThemeProvider>
-    // </StyledEngineProvider>
   );
 }
 

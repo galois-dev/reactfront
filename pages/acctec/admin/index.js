@@ -1,38 +1,29 @@
 import RoundBox from "@components/sitecore/RoundBox";
-import { Delete, Edit, Label } from "@mui/icons-material";
+import { CheckBox, Delete, Edit, Label, Summarize } from "@mui/icons-material";
 import {
   Button,
-  ButtonGroup,
+  Checkbox,
   Container,
-  FormControl,
-  Icon,
-  IconButton,
-  InputLabel,
-  List,
-  ListItem,
-  ListItemButton,
+  FormControlLabel,
+  FormGroup,
+  Menu,
   MenuItem,
-  Modal,
-  ModalRoot,
-  Select,
   Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
   Tabs,
   TextField,
   Typography,
 } from "@mui/material";
 import style from "@styles/AcctecAdmin.module.scss";
 import { Axios } from "@pages/index";
-import { useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import TabPanel from "@components/sitecore/TabPanel";
-import status_pill from "@helpers/status_pill";
-import { time_delta_on_unit_time } from "@helpers/intl_date";
 // Chart shit
 import { faker } from "@faker-js/faker";
 import {
@@ -48,6 +39,24 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { Box } from "@mui/system";
+import RFIDModal from "@components/acctec/RFIDModal";
+import RFIDTable from "@components/acctec/RFIDTable";
+import RFIDMeta from "@components/acctec/RFIDMeta";
+import RFIDConfig from "@components/acctec/RFIDConfig";
+import RFIDCustomerSelect from "@components/acctec/RFIDCustomerSelect";
+import RFIDSearch from "@components/acctec/RFIDSearch";
+import { time_delta_on_unit_time } from "@helpers/intl_date";
+import { listRFID } from "@network/RFID";
+import { getAcctecGroup, listAcctecGroup } from "@network/acctec_group";
+import { listCustomer } from "@network/customer";
+import { listAcctecConfig } from "@network/acctec_config";
+import {
+  getControllerGroup,
+  listControllerGroup,
+} from "@network/controller_group";
+import RFIDOptions from "@components/acctec/RFIDOptions";
+import LoadingPage from "@components/sitecore/LoadingPage";
+import LoadingComponent from "@components/sitecore/LoadingComponent";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -58,139 +67,13 @@ ChartJS.register(
   Legend,
   Filler
 );
+import {
+  SelectedCustomerProvider,
+  useSelectedCustomerContext,
+  useSelectedCustomerDispatchContext,
+} from "@state/selectedCustomer";
 
-function dataToRow(
-  data,
-  handleEdit,
-  HandleDelete,
-  deselectModal,
-  modalSelected
-) {
-  return (
-    <TableRow>
-      <TableCell>{data.Token}</TableCell>
-      <TableCell>
-        {data.ControllerGroup?.map((cid, idx) => {
-          return (
-            <span key={String(idx)}>
-              {cid}
-              <br />
-              <br />
-            </span>
-          );
-        })}
-        <span>
-          {data.ControllerGroup
-            ? data.ControllerGroup[data.ControllerGroup.length - 1]
-            : ""}
-        </span>
-      </TableCell>
-      <TableCell>
-        {data.Group?.map((group_id, idx) => {
-          return idx !== data.Group.length - 1 ? (
-            <span key={String(idx)}>
-              {group_id}
-              <br />
-              <br />
-            </span>
-          ) : (
-            <span key={String(idx)}>{group_id}</span>
-          );
-        })}
-
-        {/* <span>{data.Group[data.Group.length - 1]}</span> */}
-      </TableCell>
-      <TableCell align="center">{data.NumUses}</TableCell>
-      <TableCell align="center">{data.MaxUses}</TableCell>
-      <TableCell>{data.LastUse}</TableCell>
-      <TableCell>
-        {data.Expiration ? time_delta_on_unit_time(data.Expiration) : "Never"}
-      </TableCell>
-      <TableCell>{status_pill(data.status)}</TableCell>
-      <TableCell>{time_delta_on_unit_time(data.date_created, "day")}</TableCell>
-      <TableCell align="right">
-        <ButtonGroup>
-          <IconButton
-            variant="contained"
-            icon="edit"
-            onClick={() => {
-              !modalSelected ? handleEdit(data.id) : deselectModal();
-            }}
-          >
-            <Icon>
-              <Edit />
-            </Icon>
-          </IconButton>
-          <IconButton
-            variant="contained"
-            onClick={() => {
-              !modalSelected ? HandleDelete(data.id) : deselectModal();
-            }}
-          >
-            <Icon>
-              <Delete />
-            </Icon>
-          </IconButton>
-        </ButtonGroup>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-async function fetchData(customer) {
-  return Axios.get("/api/rfid/").then((res) => {
-    return res.data;
-  });
-}
-
-async function fetchCustomers() {
-  // return Axios.get("/api/customers/").then((res) => {
-  //   return res?.data;
-  // });
-  return [
-    {
-      customerName: "Customer 1",
-      id: "12343125321",
-      currentTotalUsers: 250,
-      currentTempUsers: 70,
-      maxTotalUsers: 5000,
-      maxTempUsers: 2000,
-    },
-    {
-      customerName: "Customer 2",
-      id: "123431253212",
-      currentTotalUsers: 550,
-      currentTempUsers: 220,
-      maxTotalUsers: 13000,
-      maxTempUsers: 4000,
-    },
-    {
-      customerName: "Customer 3",
-      id: "123431253215",
-      currentTotalUsers: 130,
-      currentTempUsers: 50,
-      maxTotalUsers: 15000,
-      maxTempUsers: 7000,
-    },
-    {
-      customerName: "Customer 3",
-      id: "123431253215",
-      currentTotalUsers: 130,
-      currentTempUsers: 50,
-      maxTotalUsers: 15000,
-      maxTempUsers: 7000,
-    },
-    {
-      customerName: "Customer 3",
-      id: "123431253215",
-      currentTotalUsers: 130,
-      currentTempUsers: 50,
-      maxTotalUsers: 15000,
-      maxTempUsers: 7000,
-    },
-  ];
-}
-
+// Chart helpers
 export const options = {
   responsive: true,
   plugins: {
@@ -208,7 +91,6 @@ export const options = {
   },
   backgroundColor: "rgba(255, 0, 0, 0.5)",
 };
-
 const labels = [
   "January",
   "February",
@@ -224,9 +106,9 @@ const labels = [
   "December",
 ];
 
-const somedata = {};
-
 function convertRFIDsIntoChartData(RFIDs) {
+  if (RFIDs === undefined) return [];
+  if (!(RFIDs.length >= 0)) return [];
   // Map the date_created field of each RFID to the "labels" variable.
   let newLabels = [
     "January",
@@ -260,39 +142,164 @@ function convertRFIDsIntoChartData(RFIDs) {
 
   return newLabels;
 }
-
+// Fetch and Transforms
+async function fetchData(customer) {
+  return await listRFID();
+}
+async function fetchCustomers() {
+  return await listAcctecConfig();
+}
+async function fetchAcctecGroups() {
+  return await listAcctecGroup();
+}
+async function fetchControllerGroups() {
+  return await listControllerGroup();
+}
 async function populateGroups(RFIDs) {
   /* This function first extracts all the group IDs from the RFIDs and removes the duplicates. Then it makes a GET request for each group ID using the provided API endpoint. Since the get request is asynchronous, we use promise.all to wait for all the requests to resolve. Then we use the same logic as the previous function to map over the RFIDs and replace the group IDs with the group names. This function returns the updated RFID list.
   Note: This function is asynchronous so you need to use await when you call it.*/
+
+  if (RFIDs === undefined) return []; // pass args or get rekt
+  if (!(RFIDs.length >= 0)) return []; // Look strange, dont question it
+  let updatedRFIDs = RFIDs;
+
   let groupIDs = RFIDs.reduce((groupIDs, rfid) => {
     groupIDs.push(...rfid.Group);
     return groupIDs;
   }, []);
   groupIDs = [...new Set(groupIDs)]; // Find each unique RFID group ID
+  // If there are no groups, return the RFID list (no need to make any
+  if (groupIDs.length !== 0) {
+    let groupPromises = groupIDs.map(async (groupID) => {
+      let group = getAcctecGroup(groupID);
+      return group;
+    }); // Make a GET request for each group ID
 
-  let groupPromises = groupIDs.map(async (groupID) => {
-    let group = await Axios.get(`/api/AcctGroup/${groupID}`);
-    return group.data;
-  }); // Make a GET request for each group ID
-
-  let groups = await Promise.all(groupPromises); // Await in parallel
-  let updatedRFIDs = RFIDs.map((rfid) => {
-    // Map over the RFID list
-    let groupNames = rfid.Group.map((groupID) => {
-      let group = groups.find((group) => group.id === groupID);
-      return group ? group.Name : null;
+    let groups = await Promise.all(groupPromises); // Await in parallel
+    updatedRFIDs = RFIDs.map((rfid) => {
+      // Map over the RFID list
+      rfid._Group = rfid.Group; // Store the original group IDs
+      let groupNames = rfid.Group.map((groupID) => {
+        let group = groups.find((group) => group.id === groupID);
+        return group ? group.Name : null;
+      });
+      rfid.Group = groupNames;
+      return rfid;
     });
-    rfid.Group = groupNames;
-    return rfid;
-  });
+  }
+
+  let controllerGroupIDs = RFIDs.reduce((controllerGroupIDs, rfid) => {
+    controllerGroupIDs.push(rfid.ControllerGroup);
+    return controllerGroupIDs;
+  }, []);
+  controllerGroupIDs = [...new Set(controllerGroupIDs)]; // Find each unique RFID group ID
+  if (controllerGroupIDs.length !== 0) {
+    let controllerGroupPromises = controllerGroupIDs.map(async (groupID) => {
+      let group = getControllerGroup(groupID);
+      return group;
+    }); // Make a GET request for each group ID
+
+    let groups = await Promise.all(controllerGroupPromises); // Await in parallel
+    updatedRFIDs = RFIDs.map((rfid) => {
+      // Map over the RFID list
+      rfid._ControllerGroup = rfid.ControllerGroup; // Store the original group IDs
+      let CgroupObj = groups.find((group) => group.id === rfid.ControllerGroup);
+
+      rfid.ControllerGroup = CgroupObj.Name;
+      return rfid;
+    });
+  }
+
   return updatedRFIDs; // Return the updated RFID list
 }
+async function calculateCursoryStats(data) {
+  // This function calculates the percentage of active users, the total number of users, the average age of users, the size of each group, and the age of the newest and oldest users.
+  const default_return = {
+    activePct: 0,
+    totalSize: 0,
+    groupSizes: 0,
+    avgAge: 0,
+    newest: 0,
+    oldest: 0,
+  };
+  if (data === undefined) return default_return;
+  if (!(data.length >= 0)) return default_return;
 
-export const Admin = () => {
+  // Calculate the percentage of people who are currently active
+  let activePct =
+    data.filter((item) => item.status === "A").length / data.length;
+  let totalSize = data.length;
+  // Calculate the size of each unique group and sort them in descending order
+  let groupSizes = data.reduce((groupSizes, item) => {
+    item.Group.map((group) => {
+      if (groupSizes[group]) {
+        groupSizes[group] += 1;
+      } else {
+        groupSizes[group] = 1;
+      }
+    });
+    return groupSizes;
+  }, {});
+  groupSizes = Object.entries(groupSizes).sort((a, b) => b[1] - a[1]);
+
+  // Compute average age of the rifd users
+  let avgAge = data.reduce((sum, item) => {
+    // Compute the time elapsed from data_created
+    let timeElapsed = new Date() - new Date(item.date_created);
+    // Convert the time elapsed to days
+    let daysElapsed = timeElapsed / (1000 * 3600 * 24);
+    return daysElapsed + sum;
+  }, 0);
+  avgAge = Math.round(avgAge / data.length);
+
+  // Find the newest and oldest RFID
+  let newest = data.reduce((newest, item) => {
+    if (new Date(item.date_created) > new Date(newest.date_created)) {
+      return item;
+    } else {
+      return newest;
+    }
+  });
+  let oldest = data.reduce((oldest, item) => {
+    if (new Date(item.date_created) < new Date(oldest.date_created)) {
+      return item;
+    } else {
+      return oldest;
+    }
+  });
+  newest = time_delta_on_unit_time(newest.date_created);
+  oldest = time_delta_on_unit_time(oldest.date_created);
+
+  return { activePct, totalSize, groupSizes, avgAge, newest, oldest };
+}
+// search function
+function filterData(data, searchString) {
+  return data.filter((item) => {
+    return (
+      (item.Active !== null && item.Active.toString().includes(searchString)) ||
+      (item.ControllerGroup !== null &&
+        String(item.ControllerGroup)
+          .toLowerCase()
+          .includes(searchString.toLowerCase())) ||
+      (item.Group !== null && item.Group.includes(searchString)) ||
+      (item.Phone !== null && item.Phone.includes(searchString)) ||
+      (item.Token !== null && item.Token.includes(searchString)) ||
+      (item.Name !== null && item.Name.includes(searchString))
+    );
+  });
+}
+
+export const AdminInner = () => {
   // REST API return data
   let [data, setData] = useState([]);
+  let [dataFiltered, setDataFiltered] = useState([]);
   let [customers, setCustomers] = useState([]);
-  let [selectedCustomer, setSelectedCustomer] = useState(null);
+  let selectedCustomerContext = useSelectedCustomerContext();
+  let selectedCustomerDispatch = useSelectedCustomerDispatchContext();
+
+  let [controllerGroups, setControllerGroups] = useState([]);
+  let [acctecGroups, setAcctecGroups] = useState([]);
+  let [cursoryStats, setCursoryStats] = useState([]);
   // modal states
   let [modalActive, setModalActive] = useState(false);
   let [modalMode, setModalMode] = useState("edit");
@@ -304,6 +311,12 @@ export const Admin = () => {
   // table state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  // search state
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // table options state
+  const [showDeleted, setShowDeleted] = useState(true);
+  const [showActive, setShowActive] = useState(true);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -330,6 +343,11 @@ export const Admin = () => {
     setModalMode("delete");
     setSelectedRFID(data.find((item) => item.id === id));
   };
+  const handleLogs = (id) => {
+    setModalActive(true);
+    setModalMode("logs");
+    setSelectedRFID(data.find((item) => item.id === id));
+  };
   const pushEdit = (id) => {
     Axios.put("/api/rfid/" + id, modalFormData).then((res) => {
       // update data array and update state
@@ -350,126 +368,89 @@ export const Admin = () => {
     });
   };
 
+  // #TODO: fix the race condition in setup useffect
+
   // Setup
   useEffect(() => {
     fetchCustomers().then((res) => {
       setCustomers(res);
-      setSelectedCustomer(res[0]);
+      selectedCustomerDispatch({ type: "SET", payload: res[0] });
     });
   }, []);
+  // Groups calls
   useEffect(() => {
-    fetchData(selectedCustomer).then(async (res) => {
-      await populateGroups(res);
-      console.log(convertRFIDsIntoChartData(res));
-      setData(res);
+    fetchAcctecGroups().then((res) => {
+      setAcctecGroups(res);
     });
-  }, [selectedCustomer]);
+    fetchControllerGroups().then((res) => {
+      setControllerGroups(res);
+    });
+  }, [selectedCustomerContext]);
+  // Data calls
+  useEffect(() => {
+    fetchData(selectedCustomerContext.selectedCustomer).then(async (res) => {
+      await populateGroups(res);
+      await setData(res);
+      let cursoryStatsHold = await calculateCursoryStats(res);
+      await setCursoryStats(cursoryStatsHold);
+    });
+  }, [selectedCustomerContext]);
+  // Search calls
+  useEffect(() => {
+    if (search !== "") {
+      setSearchResults(filterData(data, search));
+    } else {
+      setSearchResults(data);
+    }
+  }, [search, data]);
+  // table options calls
+  useEffect(() => {
+    if (showDeleted && showActive) {
+      setDataFiltered(data);
+    } else if (showDeleted && !showActive) {
+      setDataFiltered(data.filter((item) => !(item.status === "A")));
+    } else if (!showDeleted && showActive) {
+      setDataFiltered(data.filter((item) => !(item.status === "D")));
+    } else {
+      setDataFiltered(
+        data.filter((item) => !(item.status === "D" || item.status === "A"))
+      );
+    }
+  }, [data, showDeleted, showActive]);
+
   // Exit condition for useEffect
-  if (!data || data.length == 0) return <div>Loading...</div>;
-  // Keep at bottom of file
-  const rows = data.map((data) => {
-    return dataToRow(
-      data,
-      handleEdit,
-      handleDelete,
-      deselectModal,
-      modalActive
-    );
-  });
+  if (!data || data.length == 0) return <LoadingPage />;
 
   return (
     <span>
-      <Modal
-        open={modalActive}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          // background: "rgba(0,0,0,0)",
-          // dropShadow: "0px 0px 0px 0px",
-          width: 400,
-        }}
-      >
-        <RoundBox sx={{ m: 0, height: "100%", borderRadius: 0, p: 2 }}>
-          {modalMode === "edit" ? (
-            <div>
-              <Typography variant="h5">Edit {selectedRFID["Token"]}</Typography>
-              <Typography variant="h6">
-                Called: {selectedRFID["Name"]}
-              </Typography>
-              <br />
-              <div className={style.modal_form}></div>
-              <FormControl>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                <Select label="Status" defaultValue={selectedRFID.status}>
-                  <MenuItem value="A">Active</MenuItem>
-                  <MenuItem value="I">Inactive</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          ) : (
-            <div>
-              <Typography variant="h5">
-                Deactivate {selectedRFID["Token"]}
-              </Typography>
-              <Typography variant="h6">
-                Called: {selectedRFID["Name"]}
-              </Typography>
-              <br />
-              <div className={style.modal_form}></div>
-              <FormControl></FormControl>
-            </div>
-          )}
-        </RoundBox>
-      </Modal>
+      <RFIDModal
+        modalActive={modalActive}
+        selectedRFID={selectedRFID}
+        setSelectedRFID={setSelectedRFID}
+        acctecGroups={acctecGroups}
+        controllerGroups={controllerGroups}
+        cancel={deselectModal}
+        save={pushEdit}
+        delete={pushDelete}
+        modalMode={modalMode}
+        setModalActive={setModalActive}
+      />
       <Container
         sx={{
           mt: 3,
         }}
       >
-        <Container
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-            gap: 2,
-          }}
-        >
+        <Container className={style.top_container}>
           <RoundBox>
-            <List
-              dense
-              sx={{
-                overflowY: "scroll",
-                height: "185px",
-              }}
-            >
-              {customers.map((customer, idx) => {
-                return customer.id ? (
-                  <ListItemButton
-                    selected={selectedCustomer.id == customer.id}
-                    key={String(idx)}
-                    onMouseEnter={() => {}}
-                    onMouseLeave={() => {}}
-                    onClick={() => {
-                      setSelectedCustomer(customer);
-                    }}
-                  >
-                    <Typography
-                      color="primary.dark"
-                      variant="body2"
-                      align="center"
-                    >
-                      {customer.customerName}
-                    </Typography>
-                  </ListItemButton>
-                ) : (
-                  ""
-                );
-              })}
-            </List>
+            <RFIDCustomerSelect customers={customers} />
           </RoundBox>
-          <RoundBox sx={{ width: "100%" }}>
+          <RoundBox
+            sx={{
+              width: "100%",
+              display: "grid",
+              justifyContent: "center",
+            }}
+          >
             <Line
               options={options}
               data={{
@@ -484,49 +465,10 @@ export const Admin = () => {
                 ],
               }}
               height={80}
-              redraw={true}
             />
           </RoundBox>
           <RoundBox sx={{ p: 2 }}>
-            <Typography color="primary.main" variant="h5" gutterBottom={false}>
-              Meta data
-            </Typography>
-            <List>
-              <ListItem sx={{ minWidth: "200px" }}>
-                <Typography color="success.main" variant="caption" align="left">
-                  Temp users
-                </Typography>
-                <hr></hr>
-                <Typography color="success.light" variant="body1" align="right">
-                  {selectedCustomer.currentTempUsers} /
-                  {" " + selectedCustomer.maxTempUsers}
-                </Typography>
-              </ListItem>
-              <ListItem sx={{ minWidth: "200px" }}>
-                <Typography color="success.main" variant="caption" align="left">
-                  Perm users
-                </Typography>
-                <hr></hr>
-                <Typography color="success.light" variant="body1" align="right">
-                  {selectedCustomer.currentTotalUsers -
-                    selectedCustomer.currentTempUsers +
-                    " "}
-                  /{" "}
-                  {selectedCustomer.maxTotalUsers -
-                    selectedCustomer.maxTempUsers}
-                </Typography>
-              </ListItem>
-              <ListItem sx={{ minWidth: "200px" }}>
-                <Typography color="success.main" variant="caption" align="left">
-                  Total users
-                </Typography>
-                <hr></hr>
-                <Typography color="success.light" variant="body1" align="right">
-                  {selectedCustomer.currentTotalUsers} /
-                  {" " + selectedCustomer.maxTotalUsers}
-                </Typography>
-              </ListItem>
-            </List>
+            <RFIDMeta />
           </RoundBox>
         </Container>
       </Container>
@@ -549,145 +491,96 @@ export const Admin = () => {
           </Tabs>
         </RoundBox>
         <TabPanel value={tab} index={0}>
-          <RoundBox sx={{ m: 0 }}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Token</TableCell>
-                    <TableCell>Controller Group</TableCell>
-                    <TableCell>Group</TableCell>
-                    <TableCell>Number of uses</TableCell>
-                    <TableCell>Limit of uses</TableCell>
-                    <TableCell>Last use date</TableCell>
-                    <TableCell>Expiration</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Date Created</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+          <RoundBox
+            sx={{ m: 0, pt: 2, display: "flex", flexDirection: "column" }}
+          >
+            <Container
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <RFIDOptions>
+                <Box sx={{ p: 1 }}>
+                  <FormGroup fullWidth>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          value={showDeleted}
+                          defaultChecked={showDeleted}
+                          onChange={() => {
+                            setShowDeleted(!showDeleted);
+                          }}
+                        />
+                      }
+                      label="Show Deleted"
+                    />
+                  </FormGroup>
+                  <FormGroup fullWidth>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          value={showActive}
+                          defaultChecked={showActive}
+                          onChange={() => {
+                            setShowActive(!showActive);
+                          }}
+                        />
+                      }
+                      label="Show Active"
+                    />
+                  </FormGroup>
+                </Box>
+              </RFIDOptions>
+              <div>
+                {/* <RFIDSearch
+                  searchText={search}
+                  setSearchText={setSearch}
+                  options={searchResults}
+                  /> */}
+              </div>
+              <Button>{search ? "Clear" : ""}</Button>
+            </Container>
+            {data.length > 0 ? (
+              <RFIDTable
+                data={dataFiltered}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                handleEdit={handleEdit}
+                handleDelete={handleDelete}
+                handleLogs={handleLogs}
+                handleChangePage={handleChangePage}
+                handleChangeRowsPerPage={handleChangeRowsPerPage}
+                deselectModal={deselectModal}
+                modalActive={modalActive}
+              />
+            ) : (
+              <LoadingComponent />
+            )}
           </RoundBox>
         </TabPanel>
         <TabPanel value={tab} index={1}>
           <RoundBox sx={{ m: 0 }}>
-            <Box
-              sx={{
-                flexGrow: 1,
-                bgcolor: "background.paper",
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                gridTemplateRows: "auto",
-                height: 400,
-                width: "100%",
-                justifyContent: "space-between",
-              }}
-            >
-              <Tabs
-                orientation="vertical"
-                variant="scrollable"
-                value={configTab}
-                onChange={(event, newValue) => {
-                  setConfigTab(newValue);
-                }}
-                sx={{ borderRight: 1, borderColor: "divider" }}
-              >
-                <Tab label="Overview" />
-                <Tab label="Controller groups" />
-                <Tab label="Acctec groups" />
-                <Tab label="Limits" />
-              </Tabs>
-              <TabPanel value={configTab} index={0}>
-                <Typography variant="h5">Config</Typography>
-              </TabPanel>
-              <TabPanel value={configTab} index={1}>
-                <Typography variant="h5">Controller groups</Typography>
-              </TabPanel>
-              <TabPanel value={configTab} index={2}>
-                <Typography variant="h5">Acctec groups</Typography>
-              </TabPanel>
-              <TabPanel
-                value={configTab}
-                index={3}
-                id={`vertical-tabpanel-2`}
-                sx={{ width: "100%", margin: "auto", p: 0 }}
-              >
-                <Typography variant="h5">Limits</Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    width: "100%",
-                    p: 1,
-                    gap: 2,
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <TextField
-                    id="temp-users"
-                    label="Temp users"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    variant="standard"
-                    value={selectedCustomer.maxTempUsers}
-                    onChange={(event) => {
-                      setSelectedCustomer({
-                        ...selectedCustomer,
-                        maxTempUsers: event.target.value,
-                      });
-                    }}
-                  />
-                  <TextField
-                    id="perm-users"
-                    label="Total users"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    variant="standard"
-                    value={selectedCustomer.maxTotalUsers}
-                    onChange={(event) => {
-                      setSelectedCustomer({
-                        ...selectedCustomer,
-                        maxTotalUsers: event.target.value,
-                      });
-                    }}
-                  />
-                </Box>
-              </TabPanel>
-            </Box>
-            <Box sx={{ p: 3 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={() => {
-                  updateCustomer(selectedCustomer);
-                }}
-              >
-                Save
-              </Button>
-            </Box>
+            <RFIDConfig
+              configTab={configTab}
+              setConfigTab={setConfigTab}
+              updateCustomer={pushEdit}
+              cursoryStats={cursoryStats}
+            />
           </RoundBox>
         </TabPanel>
       </Container>
     </span>
+  );
+};
+
+export const Admin = () => {
+  return (
+    <SelectedCustomerProvider>
+      <AdminInner />
+    </SelectedCustomerProvider>
   );
 };
 

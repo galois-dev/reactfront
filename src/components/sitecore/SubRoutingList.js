@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Icon from "@mui/material/Icon";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RadarIcon from "@mui/icons-material/Radar";
+import { amber, indigo } from "@mui/material/colors";
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message || "Assertion failed");
@@ -29,6 +30,10 @@ export const SubRoutingList = ({ items }) => {
         return (
           <div
             className={styles.pill}
+            style={{
+              backgroundColor:
+                expanded === index ? indigo["200"] : indigo["400"],
+            }}
             key={index}
             onClick={() => {
               router.push(item.to);
