@@ -68,10 +68,15 @@ ChartJS.register(
   Filler
 );
 import {
-  SelectedCustomerProvider,
   useSelectedCustomerContext,
   useSelectedCustomerDispatchContext,
 } from "@state/selectedCustomer";
+import SelectedRFIDProvider, {
+  useSelectedRFIDContext,
+  useSelectedRFIDDispatchContext,
+} from "@state/selectedRFID";
+import { AdminProvider } from "@state/AdminProvider";
+import { useConfigGroup } from "@state/ConfigGroups";
 
 // Chart helpers
 export const options = {
@@ -143,18 +148,10 @@ function convertRFIDsIntoChartData(RFIDs) {
   return newLabels;
 }
 // Fetch and Transforms
-async function fetchData(customer) {
-  return await listRFID();
-}
-async function fetchCustomers() {
-  return await listAcctecConfig();
-}
-async function fetchAcctecGroups() {
-  return await listAcctecGroup();
-}
-async function fetchControllerGroups() {
-  return await listControllerGroup();
-}
+const fetchData = async (customer) => await listRFID();
+const fetchCustomers = async () => await listAcctecConfig();
+const fetchAcctecGroups = async () => await listAcctecGroup();
+const fetchControllerGroups = async () => await listControllerGroup();
 async function populateGroups(RFIDs) {
   /* This function first extracts all the group IDs from the RFIDs and removes the duplicates. Then it makes a GET request for each group ID using the provided API endpoint. Since the get request is asynchronous, we use promise.all to wait for all the requests to resolve. Then we use the same logic as the previous function to map over the RFIDs and replace the group IDs with the group names. This function returns the updated RFID list.
   Note: This function is asynchronous so you need to use await when you call it.*/
@@ -289,14 +286,14 @@ function filterData(data, searchString) {
   });
 }
 
-export const AdminInner = () => {
+export const AdminController = () => {
   // REST API return data
   let [data, setData] = useState([]);
   let [dataFiltered, setDataFiltered] = useState([]);
   let [customers, setCustomers] = useState([]);
   let selectedCustomerContext = useSelectedCustomerContext();
   let selectedCustomerDispatch = useSelectedCustomerDispatchContext();
-
+  let [groupContext, groupDispatch] = useConfigGroup();
   let [controllerGroups, setControllerGroups] = useState([]);
   let [acctecGroups, setAcctecGroups] = useState([]);
   let [cursoryStats, setCursoryStats] = useState([]);
@@ -304,7 +301,9 @@ export const AdminInner = () => {
   let [modalActive, setModalActive] = useState(false);
   let [modalMode, setModalMode] = useState("edit");
   let [modalFormData, setModalFormData] = useState({});
-  let [selectedRFID, setSelectedRFID] = useState({});
+  let selectedRFIDContext = useSelectedRFIDContext();
+  let selectedRFIDDispatch = useSelectedRFIDDispatchContext();
+
   // Tab state
   let [tab, setTab] = useState(0);
   let [configTab, setConfigTab] = useState(0);
@@ -328,26 +327,6 @@ export const AdminInner = () => {
   };
 
   // Event handlers
-  const deselectModal = () => {
-    setModalActive(false);
-    setModalFormData({});
-    setSelectedRFID({});
-  };
-  const handleEdit = (id) => {
-    setModalActive(true);
-    setModalMode("edit");
-    setSelectedRFID(data.find((item) => item.id === id));
-  };
-  const handleDelete = (id) => {
-    setModalActive(true);
-    setModalMode("delete");
-    setSelectedRFID(data.find((item) => item.id === id));
-  };
-  const handleLogs = (id) => {
-    setModalActive(true);
-    setModalMode("logs");
-    setSelectedRFID(data.find((item) => item.id === id));
-  };
   const pushEdit = (id) => {
     Axios.put("/api/rfid/" + id, modalFormData).then((res) => {
       // update data array and update state
@@ -368,7 +347,7 @@ export const AdminInner = () => {
     });
   };
 
-  // #TODO: fix the race condition in setup useffect
+  //#TODO: fix the race condition in setup useffect
 
   // Setup
   useEffect(() => {
@@ -381,11 +360,13 @@ export const AdminInner = () => {
   useEffect(() => {
     fetchAcctecGroups().then((res) => {
       setAcctecGroups(res);
+      groupDispatch({ type: "SET_ACCTEC_GROUPS", payload: res });
     });
     fetchControllerGroups().then((res) => {
       setControllerGroups(res);
+      groupDispatch({ type: "SET_CONTROLLER_GROUPS", payload: res });
     });
-  }, [selectedCustomerContext]);
+  }, [selectedCustomerContext?.selectedCustomer?.id]);
   // Data calls
   useEffect(() => {
     fetchData(selectedCustomerContext.selectedCustomer).then(async (res) => {
@@ -394,7 +375,7 @@ export const AdminInner = () => {
       let cursoryStatsHold = await calculateCursoryStats(res);
       await setCursoryStats(cursoryStatsHold);
     });
-  }, [selectedCustomerContext]);
+  }, [selectedCustomerContext?.selectedCustomer?.id]);
   // Search calls
   useEffect(() => {
     if (search !== "") {
@@ -424,16 +405,8 @@ export const AdminInner = () => {
   return (
     <span>
       <RFIDModal
-        modalActive={modalActive}
-        selectedRFID={selectedRFID}
-        setSelectedRFID={setSelectedRFID}
         acctecGroups={acctecGroups}
         controllerGroups={controllerGroups}
-        cancel={deselectModal}
-        save={pushEdit}
-        delete={pushDelete}
-        modalMode={modalMode}
-        setModalActive={setModalActive}
       />
       <Container
         sx={{
@@ -468,7 +441,7 @@ export const AdminInner = () => {
             />
           </RoundBox>
           <RoundBox sx={{ p: 2 }}>
-            <RFIDMeta />
+            <RFIDMeta RFIDS={data} />
           </RoundBox>
         </Container>
       </Container>
@@ -548,13 +521,8 @@ export const AdminInner = () => {
                 data={dataFiltered}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
-                handleLogs={handleLogs}
                 handleChangePage={handleChangePage}
                 handleChangeRowsPerPage={handleChangeRowsPerPage}
-                deselectModal={deselectModal}
-                modalActive={modalActive}
               />
             ) : (
               <LoadingComponent />
@@ -578,9 +546,9 @@ export const AdminInner = () => {
 
 export const Admin = () => {
   return (
-    <SelectedCustomerProvider>
-      <AdminInner />
-    </SelectedCustomerProvider>
+    <AdminProvider>
+      <AdminController />
+    </AdminProvider>
   );
 };
 

@@ -1,7 +1,5 @@
 import LoadingComponent from "@components/sitecore/LoadingComponent";
 import {
-  selectedCustomerContext,
-  selectedCustomerDispatchContext,
   useSelectedCustomerContext,
   useSelectedCustomerDispatchContext,
 } from "@state/selectedCustomer";
@@ -9,9 +7,10 @@ import { useContext } from "react";
 
 const { List, ListItemButton, Typography } = require("@mui/material");
 
-const RFIDCustomerSelect = ({ customers }) => {
-  const selectedCustomer = useSelectedCustomerContext();
+const RFIDCustomerSelect = ({ customers, onChange }) => {
+  const selectedCustomerContext = useSelectedCustomerContext();
   const dispatchSelectedCustomer = useSelectedCustomerDispatchContext();
+  let { selectedCustomer } = selectedCustomerContext;
 
   if (customers === undefined || customers.length === 0 || !customers) {
     return <LoadingComponent />;
@@ -29,11 +28,12 @@ const RFIDCustomerSelect = ({ customers }) => {
         customers.map((customer, idx) => {
           return customer.id ? (
             <ListItemButton
-              selected={selectedCustomer.selectedCustomer.id == customer.id}
+              selected={selectedCustomer.id == customer.id}
               key={String(idx)}
               onClick={() => {
+                if (customer.id !== selectedCustomer.id) onChange(customer);
                 dispatchSelectedCustomer({
-                  type: "set",
+                  type: "SET",
                   payload: customer,
                 });
               }}

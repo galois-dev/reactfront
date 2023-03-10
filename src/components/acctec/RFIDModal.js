@@ -13,21 +13,20 @@ import {
 import { RFIDForm } from "./RFIDForm";
 import FormActionButtons from "./FormActionButtons";
 import { grey } from "@mui/material/colors";
+import {
+  useSelectedRFIDContext,
+  useSelectedRFIDDispatchContext,
+} from "@state/selectedRFID";
 
-export const RFIDModal = ({
-  selectedRFID,
-  setSelectedRFID,
-  modalActive,
-  setModalActive,
-  modalMode,
-  cancel,
-  save,
-  deleteRFID,
-  acctecGroups,
-  controllerGroups,
-}) => {
-  return (
-    <Modal open={modalActive} onClose={() => setModalActive(false)}>
+export const RFIDModal = ({ acctecGroups, controllerGroups }) => {
+  let selectedRFIDContext = useSelectedRFIDContext();
+  let selectedRFIDDispatch = useSelectedRFIDDispatchContext();
+  let { selectedRFID, modalMode, modalActive } = selectedRFIDContext;
+   return (
+    <Modal
+      open={modalActive}
+      onClose={() => selectedRFIDDispatch({ type: "MODAL_CLOSE" })}
+    >
       <RoundBox
         sx={{
           m: 0,
@@ -48,8 +47,6 @@ export const RFIDModal = ({
 
         {modalMode === "edit" ? (
           <RFIDForm
-            selectedRFID={selectedRFID}
-            setSelectedRFID={setSelectedRFID}
             acctecGroups={acctecGroups}
             controllerGroups={controllerGroups}
             onCancel={() => {
@@ -64,7 +61,7 @@ export const RFIDModal = ({
             <br />
             <FormActionButtons
               onCancel={() => {
-                setModalActive(false);
+                selectedRFIDDispatch({ type: "MODAL_CLOSE" });
               }}
               onDelete={() => {
                 deleteRFID(selectedRFID);
@@ -83,5 +80,5 @@ export const RFIDModal = ({
     </Modal>
   );
 };
-
+// "Fira Code", monospace
 export default RFIDModal;

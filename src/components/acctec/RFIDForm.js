@@ -20,31 +20,29 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import FormActionButtons from "./FormActionButtons";
 import ListSelect from "./ListSelect";
 import SelectableList from "./SelectableList";
+import {
+  useSelectedRFIDContext,
+  useSelectedRFIDDispatchContext,
+} from "@state/selectedRFID";
 
 export const RFIDForm = ({
-  selectedRFID,
-  setSelectedRFID,
   onCancel,
   onSave,
   controllerGroups,
   acctecGroups,
 }) => {
-  const [stagedChanges, setStagedChanges] = useState({});
   const [dateActive, setDateActive] = useState(false);
+  let selectedRFIDContext = useSelectedRFIDContext();
+  let selectedRFIDDispatch = useSelectedRFIDDispatchContext();
+  let { selectedRFID } = selectedRFIDContext;
 
-  const onChange = (key, arg) => {
-    if (stagedChanges[key] === undefined) {
-      setStagedChanges({ ...stagedChanges, [key]: selectedRFID[key] });
-    }
-    setSelectedRFID({ ...selectedRFID, [key]: arg, dateActive: dateActive });
-  };
+  const onChange = (key, arg) =>
+    selectedRFIDDispatch({
+      type: "CHANGE_ARG",
+      payload: { key: key, arg: arg },
+    });
 
-  const handleCancel = () => {
-    for (const key in stagedChanges) {
-      selectedRFID[key] = stagedChanges[key];
-    }
-    onCancel();
-  };
+  const handleCancel = () => selectedRFIDDispatch({ type: "CANCEL_CHANGES" });
 
   return (
     <div
@@ -167,18 +165,14 @@ export const RFIDForm = ({
             <SelectableList
               items={acctecGroups}
               multiselect={true}
-              selected={selectedRFID.Group}
-              onChange={(e) => {}}
-            />
-            {/* <ListSelect
-              priorList={AcctecGroups}
-              setPriorList={setAcctecGroups}
-              selectedList={selectedAcctecGroups}
-              setSelectedList={setSelectedAcctecGroups}
+              selected={selectedRFID._Group}
               onChange={(e) => {
-                onChange("Group", e);
+                selectedRFIDDispatch({
+                  type: "SET_PRIVATE_ACCTEC_GROUP",
+                  payload: e,
+                });
               }}
-            /> */}
+            />
           </AccordionDetails>
         </Accordion>
       </FormControl>
@@ -190,15 +184,17 @@ export const RFIDForm = ({
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            {/* <ListSelect
-              priorList={ControllerGroups}
-              setPriorList={setControllerGroups}
-              selectedList={selectedControllerGroups}
-              setSelectedList={setSelectedControllerGroups}
+            <SelectableList
+              items={controllerGroups}
+              multiselect={false}
+              selected={selectedRFID._ControllerGroup}
               onChange={(e) => {
-                onChange("controllerGroup", e);
+                selectedRFIDDispatch({
+                  type: "SET_PRIVATE_CONTROLLER_GROUP",
+                  payload: e,
+                });
               }}
-            /> */}
+            />
           </AccordionDetails>
         </Accordion>
       </FormControl>
@@ -216,8 +212,8 @@ export const RFIDForm = ({
               multiline
               fullWidth
               defaultValue={selectedRFID.AdminNote || ""}
-              onChange={() => {
-                onChange("AdminNote", e.target.value);
+              onChange={(e) => {
+                onChange("admin_note", e.target.value);
               }}
             ></TextField>
           </AccordionDetails>

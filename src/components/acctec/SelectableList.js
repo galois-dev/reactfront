@@ -1,5 +1,10 @@
 import LoadingComponent from "@components/sitecore/LoadingComponent";
-import { Checkbox, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import {
+  Checkbox,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 export const SelectableList = ({
@@ -10,24 +15,40 @@ export const SelectableList = ({
 }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const onSelect = (item) => {
-    if (multiselect) {
-      if (selectedItems.includes(item)) {
-        setSelectedItems(selectedItems.filter((i) => i !== item.id));
+    if (item !== undefined) {
+      if (multiselect) {
+        let newSelect = selectedItems.filter((i) => i !== item);
+        if (newSelect.length === selectedItems.length) {
+          newSelect.push(item);
+        }
+        setSelectedItems(newSelect);
+        onChange(newSelect);
       } else {
-        setSelectedItems([...selectedItems, item.id]);
+        if (selectedItems.includes(item)) {
+          setSelectedItems([]);
+          onChange([]);
+        } else {
+          setSelectedItems(item);
+          onChange(item);
+        }
       }
     } else {
-      setSelectedItems([item.id]);
+      setSelectedItems([]);
+      onChange([]);
     }
   };
 
   useEffect(() => {
-    setSelectedItems(selected.id);
+    if (selected !== undefined) {
+      if (multiselect === false) {
+        setSelectedItems([selected]);
+      } else {
+        if (selected.length !== 0) {
+          setSelectedItems(selected.map((i) => i));
+        }
+      }
+    }
   }, [selected]);
-
-  useEffect(() => {
-    onChange(selectedItems);
-  }, [selectedItems]);
 
   if (items === undefined || items.length === 0) {
     return <LoadingComponent />;

@@ -16,39 +16,21 @@ import {
   IconButton,
   Icon,
 } from "@mui/material";
+import { useSelectedCustomerDispatchContext } from "@state/selectedCustomer";
+import {
+  useSelectedRFIDContext,
+  useSelectedRFIDDispatchContext,
+} from "@state/selectedRFID";
 
 // Table helper
-function dataToRow(
-  data,
-  handleEdit,
-  HandleDelete,
-  handleLogs,
-  deselectModal,
-  modalActive
-) {
+const dataToRow = (data) => {
+  let selectedRFIDContext = useSelectedRFIDContext();
+  let selectedRFIDDispatch = useSelectedRFIDDispatchContext();
+  let { modalActive } = selectedRFIDContext;
+
   // validate the arguments exist
   if (!data || data == undefined) {
     console.log("data is null");
-    return <LoadingComponent />;
-  }
-  if (!handleEdit || handleEdit == undefined) {
-    console.log("handleEdit is null");
-    return <LoadingComponent />;
-  }
-  if (!HandleDelete || HandleDelete == undefined) {
-    console.log("HandleDelete is null");
-    return <LoadingComponent />;
-  }
-  if (!handleLogs || handleLogs == undefined) {
-    console.log("handleLogs is null");
-    return <LoadingComponent />;
-  }
-  if (!deselectModal || deselectModal == undefined) {
-    console.log("deselectModal is null");
-    return <LoadingComponent />;
-  }
-  if (modalActive == null || modalActive == undefined) {
-    console.log("modalActive is null");
     return <LoadingComponent />;
   }
   // return the table row
@@ -87,7 +69,23 @@ function dataToRow(
             icon="summarize"
             color="info"
             onClick={() => {
-              !modalActive ? handleLogs(data.id) : deselectModal();
+              console.log("clicked");
+              if (!modalActive) {
+                selectedRFIDDispatch({
+                  type: "SET",
+                  payload: data,
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_MODE_LOGS",
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_OPEN",
+                });
+              } else {
+                selectedRFIDDispatch({
+                  type: "MODAL_CLOSE",
+                });
+              }
             }}
           >
             <Icon>
@@ -99,7 +97,22 @@ function dataToRow(
             icon="edit"
             color="warning"
             onClick={() => {
-              !modalActive ? handleEdit(data.id) : deselectModal();
+              if (!modalActive) {
+                selectedRFIDDispatch({
+                  type: "SET",
+                  payload: data,
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_MODE_EDIT",
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_OPEN",
+                });
+              } else {
+                selectedRFIDDispatch({
+                  type: "MODAL_CLOSE",
+                });
+              }
             }}
           >
             <Icon>
@@ -110,7 +123,22 @@ function dataToRow(
             variant="contained"
             color="error"
             onClick={() => {
-              !modalActive ? HandleDelete(data.id) : deselectModal();
+              if (!modalActive) {
+                selectedRFIDDispatch({
+                  type: "SET",
+                  payload: data,
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_MODE_DELETE",
+                });
+                selectedRFIDDispatch({
+                  type: "MODAL_OPEN",
+                });
+              } else {
+                selectedRFIDDispatch({
+                  type: "MODAL_CLOSE",
+                });
+              }
             }}
           >
             <Icon>
@@ -121,33 +149,21 @@ function dataToRow(
       </TableCell>
     </TableRow>
   );
-}
+};
 
 const Rfidtable = ({
   data,
   rowsPerPage,
   page,
-  handleEdit,
-  handleDelete,
-  handleLogs,
   handleChangePage,
   handleChangeRowsPerPage,
-  deselectModal,
-  modalActive,
 }) => {
-  if (!data || data == undefined || data.length == 0 || data == null) {
+  if (!data || data == undefined || data == null) {
     return <LoadingComponent />;
   }
 
   let rows = data.map((row) => {
-    return dataToRow(
-      row,
-      handleEdit,
-      handleDelete,
-      handleLogs,
-      deselectModal,
-      modalActive
-    );
+    return dataToRow(row);
   });
   return (
     <span>

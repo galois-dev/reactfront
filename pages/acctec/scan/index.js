@@ -1,14 +1,31 @@
-import * as React from "react";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import { Axios } from "@pages/index";
 import { Box, Button, Typography } from "@mui/material";
 import RoundBox from "@components/sitecore/RoundBox";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 export const Scan = () => {
-  const [RFID, setRFID] = React.useState("");
+  const [RFID, setRFID] = useState([]);
   const router = useRouter();
+
+  useEffect(() => {
+    // If window if focused
+    let FAKE_RFID = []; // Works because the useEffect cannot see useState only
+    // Push new data to it
+
+    const interval = setInterval(async () => {
+      if (document.hasFocus()) {
+        const text = await navigator.clipboard.readText();
+        if (!FAKE_RFID.includes(text)) {
+          FAKE_RFID.push(text);
+          await setRFID((RIFD) => [...RIFD, text]);
+        }
+      }
+    }, 250);
+    return () => clearInterval(interval);
+  }, []);
 
   function postRFID() {
     router.push(`/acctec/${RFID}`);
@@ -27,20 +44,9 @@ export const Scan = () => {
               Scan RFID
             </Typography>
             <div>
-              <TextField
-                focused={true}
-                autoFocus={true}
-                required={true}
-                variant="outlined"
-                value={RFID}
-                onChange={(e) => setRFID(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    postRFID();
-                  }
-                }}
-                sx={{ width: "320px", mb: 2 }}
-              />
+              {RFID.map((rfid) => {
+                w
+              })}
             </div>
             <div>
               <Button

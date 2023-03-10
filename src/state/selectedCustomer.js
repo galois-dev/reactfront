@@ -29,6 +29,11 @@ export function useSelectedCustomerContext() {
 export function useSelectedCustomerDispatchContext() {
   return useContext(selectedCustomerDispatchContext);
 }
+
+export function useSelectedCustomer() {
+  return [useSelectedCustomerContext(), useSelectedCustomerDispatchContext()];
+}
+
 function selectedCustomerReducer(state, action) {
   switch (action.type) {
     case "SET":
@@ -36,6 +41,48 @@ function selectedCustomerReducer(state, action) {
         ...state,
         heldCustomer: action.payload,
         selectedCustomer: action.payload,
+      };
+    case "SET_ACCTEC_GROUPS":
+      return {
+        ...state,
+        acctecGroups: action.payload,
+      };
+    case "SET_CONTROLLER_GROUPS":
+      return {
+        ...state,
+        controllerGroups: action.payload,
+      };
+    case "ADD_GLOBAL_CONTROLLER_GROUP":
+      return {
+        ...state,
+        controllerGroups: [...state.controllerGroups, action.payload],
+      };
+    case "ADD_GLOBAL_ACCTEC_GROUP":
+      return {
+        ...state,
+        acctecGroups: [...state.acctecGroups, action.payload],
+      };
+    case "UPDATE_CONTROLLER_GROUP_BY_ID":
+      return {
+        ...state,
+        controllerGroups: state.controllerGroups.map((group) => {
+          if (group.id === action.payload.id) {
+            return action.payload;
+          } else {
+            return group;
+          }
+        }),
+      };
+    case "UPDATE_ACCTEC_GROUP_BY_ID":
+      return {
+        ...state,
+        acctecGroups: state.acctecGroups.map((group) => {
+          if (group.id === action.payload.id) {
+            return action.payload;
+          } else {
+            return group;
+          }
+        }),
       };
     case "CANCEL_CHANGES":
       return {
@@ -142,6 +189,10 @@ function selectedCustomerReducer(state, action) {
 let initialState = {
   selectedCustomer: undefined,
   heldCustomer: undefined,
+  acctecGroups: [],
+  heldAccountGroups: [],
+  controllerGroups: [],
+  heldControllerGroups: [],
 };
 
 export default SelectedCustomerProvider;
