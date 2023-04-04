@@ -43,11 +43,7 @@ export const Scan = () => {
             <Typography variant="h5" align="center" gutterBottom={true}>
               Scan RFID
             </Typography>
-            <div>
-              {RFID.map((rfid) => {
-                w
-              })}
-            </div>
+            <div>{RFID.map((rfid) => {})}</div>
             <div>
               <Button
                 variant="outlined"
